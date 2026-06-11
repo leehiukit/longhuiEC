@@ -99,7 +99,7 @@ Page({
         if (res.confirm) {
           try {
             // 只清除搜索历史等非核心缓存
-            wx.removeStorageSync('yxzx_search_history')
+            wx.removeStorageSync(app.accountKey('yxzx_search_history'))
             // 如果后续有浏览记录等缓存也在这里清除
             this.calcCacheSize()
             wx.showToast({ title: '缓存已清除', icon: 'success' })

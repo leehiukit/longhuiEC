@@ -209,7 +209,7 @@ Page({
   },
 
   loadAddress() {
-    const addresses = wx.getStorageSync('yxzx_addresses') || []
+    const addresses = wx.getStorageSync(app.accountKey('yxzx_addresses')) || []
     const defaultAddr = addresses.find(addr => addr.isDefault) || addresses[0]
     if (defaultAddr) {
       this.setData({ address: defaultAddr })
@@ -301,7 +301,7 @@ Page({
     let cart = app.globalData.cart || []
     cart = cart.filter(item => !item.selected)
     app.globalData.cart = cart
-    wx.setStorageSync('yxzx_cart', cart)
+    wx.setStorageSync(app.accountKey('yxzx_cart'), cart)
     app.updateCartBadge(cart.length)
 
     this.currentOrderId = orderId
@@ -378,7 +378,7 @@ Page({
       }
 
       // 强制同步购物车角标
-      const syncedCart = wx.getStorageSync('yxzx_cart') || []
+      const syncedCart = wx.getStorageSync(app.accountKey('yxzx_cart')) || []
       app.globalData.cart = syncedCart
       app.updateCartBadge(syncedCart.length)
       this.setData({

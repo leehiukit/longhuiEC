@@ -71,7 +71,7 @@ Page({
   // 选中优惠券并返回订单页（保留兼容）
   selectCoupon(e) {
     const coupon = e.currentTarget.dataset.coupon
-    wx.setStorageSync('yxzx_selected_coupon', coupon)
+    wx.setStorageSync(app.accountKey('yxzx_selected_coupon'), coupon)
     wx.navigateBack()
   }
 })

@@ -6,6 +6,12 @@ const TOKEN_KEY = 'yxzx_token'
 const USER_KEY  = 'yxzx_user'
 const TOKEN_EXPIRE_DAYS = 7
 
+// 微信审核测试账号
+const TEST_ACCOUNT = {
+  phone: '13800138000',
+  code: '000000'
+}
+
 Page({
   data: {
     logoPath: app.globalData.logoPath || '',
@@ -57,10 +63,12 @@ Page({
     if (!/^1\d{10}$/.test(phone)) {
       return wx.showToast({ title: '手机号格式不正确', icon: 'none' })
     }
+    // 审核测试账号：固定验证码 000000
+    const isTest = phone === TEST_ACCOUNT.phone
     wx.showLoading({ title: '发送中...' })
     setTimeout(() => {
       wx.hideLoading()
-      const code = String(Math.floor(100000 + Math.random() * 900000))
+      const code = isTest ? TEST_ACCOUNT.code : String(Math.floor(100000 + Math.random() * 900000))
       this.setData({ sentCode: code })
       wx.showModal({
         title: '验证码已发送',
@@ -80,8 +88,13 @@ Page({
     if (loading) return
     if (!agreed) return wx.showToast({ title: '请先同意协议', icon: 'none' })
     if (!phone || !code) return wx.showToast({ title: '请填写完整信息', icon: 'none' })
-    if (!sentCode) return wx.showToast({ title: '请先获取验证码', icon: 'none' })
-    if (code !== sentCode) return wx.showToast({ title: '验证码不正确', icon: 'none' })
+
+    // 审核测试账号：无需先点发送验证码，直接校验
+    const isTest = phone === TEST_ACCOUNT.phone && code === TEST_ACCOUNT.code
+    if (!isTest) {
+      if (!sentCode) return wx.showToast({ title: '请先获取验证码', icon: 'none' })
+      if (code !== sentCode) return wx.showToast({ title: '验证码不正确', icon: 'none' })
+    }
 
     this.setData({ loading: true })
     try {
@@ -119,6 +132,9 @@ Page({
       app.globalData.isLoggedIn = true
       app.globalData.userInfo = userInfo
       app.globalData.openid = loginResult.openid
+
+      // 按账号隔离数据
+      app.onLoginSuccess(phone)
 
       this.saveUserRecord(phone, userInfo)
 
@@ -207,6 +223,9 @@ Page({
       app.globalData.isLoggedIn = true
       app.globalData.userInfo = userInfo
       app.globalData.openid = loginResult.openid
+
+      // 按账号隔离数据
+      app.onLoginSuccess(phone)
 
       this.saveUserRecord(phone, userInfo)
 

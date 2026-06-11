@@ -43,8 +43,8 @@ Page({
     tabs[3].count = stats.completedCount  // received 也算评价
 
     // 计算收藏数 & 优惠券数
-    const favs = wx.getStorageSync('yxzx_favorites') || []
-    const validCoupons = (wx.getStorageSync('yxzx_coupons') || []).filter(c => c.status === 'valid')
+    const favs = wx.getStorageSync(app.accountKey('yxzx_favorites')) || []
+    const validCoupons = (wx.getStorageSync(app.accountKey('yxzx_coupons')) || []).filter(c => c.status === 'valid')
 
     const menus = [...this.data.menus]
     const favMenu = menus.find(m => m.label === '我的收藏')

@@ -29,12 +29,13 @@ Page({
   },
 
   loadAddresses() {
-    let addresses = wx.getStorageSync('yxzx_addresses') || []
+    const addrKey = app.accountKey('yxzx_addresses')
+    let addresses = wx.getStorageSync(addrKey) || []
     // 清理历史遗留的演示地址
     const before = addresses.length
     addresses = addresses.filter(a => a.id !== 'default_addr_1' && a.id !== 'default_addr_2')
     if (addresses.length !== before) {
-      wx.setStorageSync('yxzx_addresses', addresses)
+      wx.setStorageSync(addrKey, addresses)
     }
     this.setData({ addresses })
   },
@@ -74,7 +75,7 @@ Page({
       success: (res) => {
         if (res.confirm) {
           let addresses = this.data.addresses.filter(a => a.id !== id)
-          wx.setStorageSync('yxzx_addresses', addresses)
+          wx.setStorageSync(app.accountKey('yxzx_addresses'), addresses)
           this.setData({ addresses })
           wx.showToast({ title: '已删除', icon: 'success' })
         }
@@ -148,7 +149,7 @@ Page({
       addresses.push(newAddr)
     }
 
-    wx.setStorageSync('yxzx_addresses', addresses)
+    wx.setStorageSync(app.accountKey('yxzx_addresses'), addresses)
     this.setData({ addresses, showModal: false })
     wx.showToast({ title: '保存成功', icon: 'success' })
   },

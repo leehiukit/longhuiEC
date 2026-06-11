@@ -8,6 +8,19 @@ const ERP_ADMIN = {
   password: 'admin123'
 }
 
+// 需要按账号隔离的数据 key（登录后会用 phone 做命名空间）
+const SCOPED_KEYS = [
+  'yxzx_addresses',
+  'yxzx_orders',
+  'yxzx_refunds',
+  'yxzx_reviews',
+  'yxzx_cart',
+  'yxzx_search_history',
+  'yxzx_favorites',
+  'yxzx_coupons',
+  'yxzx_selected_coupon'
+]
+
 App({
   onLaunch() {
     this.migrateStorageKeys()
@@ -53,6 +66,54 @@ App({
     })
   },
 
+  // 获取当前账号标识（手机号），未登录返回 null
+  getUserPhone() {
+    try {
+      const token = wx.getStorageSync('yxzx_token')
+      if (token && token.phone) return token.phone
+      const user = wx.getStorageSync('yxzx_user')
+      if (user && user.phone) return user.phone
+    } catch (_) { /* */ }
+    return null
+  },
+
+  // 按账号隔离 storage key：未登录返回原 key，登录后返回 key_phone
+  accountKey(baseKey) {
+    const phone = this.getUserPhone()
+    return phone ? `${baseKey}_${phone}` : baseKey
+  },
+
+  // 登录成功后：把旧全局数据迁移到当前账号名下
+  onLoginSuccess(phone) {
+    if (!phone) return
+    SCOPED_KEYS.forEach(baseKey => {
+      try {
+        const scopedKey = `${baseKey}_${phone}`
+        const scopedData = wx.getStorageSync(scopedKey)
+        // 目标已存在则不覆盖
+        if (scopedData !== '' && scopedData !== undefined) return
+        // 尝试从旧全局 key 迁移
+        const oldData = wx.getStorageSync(baseKey)
+        if (oldData !== '' && oldData !== undefined) {
+          wx.setStorageSync(scopedKey, oldData)
+          // ★ 迁移后立即清除旧全局数据，防止后续其他账号误迁移
+          wx.removeStorageSync(baseKey)
+        }
+      } catch (_) { /* */ }
+    })
+  },
+
+  // 退出登录（不清除按账号隔离的数据，只清 token）
+  logout() {
+    wx.removeStorageSync('yxzx_token')
+    wx.removeStorageSync('yxzx_user')
+    this.globalData.isLoggedIn = false
+    this.globalData.userInfo = null
+    this.globalData.openid = ''
+    this.globalData.cart = []
+    wx.showToast({ title: '已退出登录', icon: 'none' })
+  },
+
   // 检查登录状态（含 Token 过期检测 + openid 恢复）
   checkLoginStatus() {
     const tokenData = wx.getStorageSync('yxzx_token')
@@ -69,24 +130,14 @@ App({
     this.globalData.openid = tokenData.openid || wx.getStorageSync('yxzx_user')?.openid || ''
   },
 
-  // 退出登录
-  logout() {
-    wx.removeStorageSync('yxzx_token')
-    wx.removeStorageSync('yxzx_user')
-    this.globalData.isLoggedIn = false
-    this.globalData.userInfo = null
-    this.globalData.openid = ''
-    wx.showToast({ title: '已退出登录', icon: 'none' })
-  },
-
   // 获取用户订单列表
   getOrders() {
-    return wx.getStorageSync('yxzx_orders') || []
+    return wx.getStorageSync(this.accountKey('yxzx_orders')) || []
   },
 
   // 保存订单
   saveOrders(orders) {
-    wx.setStorageSync('yxzx_orders', orders)
+    wx.setStorageSync(this.accountKey('yxzx_orders'), orders)
   },
 
   // 添加订单
@@ -129,12 +180,12 @@ App({
 
   // 获取退款列表
   getRefunds() {
-    return wx.getStorageSync('yxzx_refunds') || []
+    return wx.getStorageSync(this.accountKey('yxzx_refunds')) || []
   },
 
   // 保存退款列表
   saveRefunds(refunds) {
-    wx.setStorageSync('yxzx_refunds', refunds)
+    wx.setStorageSync(this.accountKey('yxzx_refunds'), refunds)
   },
 
   // 创建退款申请
@@ -252,12 +303,12 @@ App({
 
   // 获取评价列表
   getReviews() {
-    return wx.getStorageSync('yxzx_reviews') || []
+    return wx.getStorageSync(this.accountKey('yxzx_reviews')) || []
   },
 
   // 保存评价列表
   saveReviews(reviews) {
-    wx.setStorageSync('yxzx_reviews', reviews)
+    wx.setStorageSync(this.accountKey('yxzx_reviews'), reviews)
   },
 
   // 添加评价
@@ -331,11 +382,12 @@ App({
   },
 
   initCart() {
-    let cart = wx.getStorageSync('yxzx_cart')
+    const cartKey = this.accountKey('yxzx_cart')
+    let cart = wx.getStorageSync(cartKey)
     // 缓存为空时写入默认购物车商品
     if (!cart || !Array.isArray(cart) || cart.length === 0) {
       cart = []
-      wx.setStorageSync('yxzx_cart', cart)
+      wx.setStorageSync(cartKey, cart)
     }
     this.globalData.cart = cart
     this.updateCartBadge(cart.length)
@@ -354,7 +406,8 @@ App({
     brandName: '有闲甄选',
     brandSlogan: '品质好物 · 甄心严选',
     logoPath: '/images/logos/logo.jpg',
-    
+    appVersion: '1.0.1',    // 应用版本号
+
     userInfo: null,
     isLoggedIn: false,
     openid: '',             // 微信 openid（登录后写入）

@@ -15,7 +15,7 @@ Page({
 
   loadCart() {
     // 每次进入都从 Storage 重新读取（确保多页面同步）
-    const cart = wx.getStorageSync('yxzx_cart') || []
+    const cart = wx.getStorageSync(app.accountKey('yxzx_cart')) || []
     app.globalData.cart = cart
     this.setData({ cartList: cart })
     app.updateCartBadge(cart.length)
@@ -53,7 +53,7 @@ Page({
     })
     
     app.globalData.cart = cartList
-    wx.setStorageSync('yxzx_cart', cartList)
+    wx.setStorageSync(app.accountKey('yxzx_cart'), cartList)
     this.setData({ cartList, selectAll: checked })
     this.calcTotal()
   },
@@ -64,7 +64,7 @@ Page({
     cartList[index].selected = !cartList[index].selected
     
     app.globalData.cart = cartList
-    wx.setStorageSync('yxzx_cart', cartList)
+    wx.setStorageSync(app.accountKey('yxzx_cart'), cartList)
     this.setData({ cartList })
     this.calcTotal()
   },
@@ -75,7 +75,7 @@ Page({
     cartList[index].quantity++
     
     app.globalData.cart = cartList
-    wx.setStorageSync('yxzx_cart', cartList)
+    wx.setStorageSync(app.accountKey('yxzx_cart'), cartList)
     this.setData({ cartList })
     this.calcTotal()
   },
@@ -87,7 +87,7 @@ Page({
     cartList[index].quantity--
     
     app.globalData.cart = cartList
-    wx.setStorageSync('yxzx_cart', cartList)
+    wx.setStorageSync(app.accountKey('yxzx_cart'), cartList)
     this.setData({ cartList })
     this.calcTotal()
   },
@@ -107,7 +107,7 @@ Page({
         if (res.confirm) {
           const newCart = cartList.filter(item => !item.selected)
           app.globalData.cart = newCart
-          wx.setStorageSync('yxzx_cart', newCart)
+          wx.setStorageSync(app.accountKey('yxzx_cart'), newCart)
           app.updateCartBadge(newCart.length)
           this.setData({ cartList: newCart })
           this.calcTotal()

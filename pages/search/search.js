@@ -1,4 +1,5 @@
 // 搜索页逻辑
+const app = getApp()
 const api = require('../../utils/api')
 
 Page({
@@ -17,7 +18,7 @@ Page({
   },
 
   loadHistory() {
-    const history = wx.getStorageSync('yxzx_search_history') || []
+    const history = wx.getStorageSync(app.accountKey('yxzx_search_history')) || []
     this.setData({ historyList: history.slice(0, 8) })
   },
 
@@ -30,10 +31,10 @@ Page({
     if (!keyword) return
     
     // 保存历史
-    let history = (wx.getStorageSync('yxzx_search_history') || []).filter(h => h !== keyword)
+    let history = (wx.getStorageSync(app.accountKey('yxzx_search_history')) || []).filter(h => h !== keyword)
     history.unshift(keyword)
     if (history.length > 10) history = history.slice(0, 10)
-    wx.setStorageSync('yxzx_search_history', history)
+    wx.setStorageSync(app.accountKey('yxzx_search_history'), history)
     this.setData({ historyList: history.slice(0, 8) })
 
     this.searchProducts(keyword)
@@ -90,7 +91,7 @@ Page({
   },
 
   clearHistory() {
-    wx.removeStorageSync('yxzx_search_history')
+    wx.removeStorageSync(app.accountKey('yxzx_search_history'))
     this.setData({ historyList: [] })
     wx.showToast({ title: '已清空', icon: 'success' })
   },

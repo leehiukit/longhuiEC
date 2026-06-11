@@ -11,7 +11,7 @@ Page({
   },
 
   loadFavorites() {
-    const favs = wx.getStorageSync('yxzx_favorites') || []
+    const favs = wx.getStorageSync(app.accountKey('yxzx_favorites')) || []
     this.setData({ favorites: favs })
   },
 
@@ -23,7 +23,7 @@ Page({
   removeFav(e) {
     const { id } = e.currentTarget.dataset
     const favs = this.data.favorites.filter(item => item.id !== id)
-    wx.setStorageSync('yxzx_favorites', favs)
+    wx.setStorageSync(app.accountKey('yxzx_favorites'), favs)
     this.setData({ favorites: favs })
     wx.showToast({ title: '已取消收藏', icon: 'none' })
   },
@@ -34,7 +34,7 @@ Page({
       content: '确定要清空所有收藏吗？',
       success: (res) => {
         if (res.confirm) {
-          wx.setStorageSync('yxzx_favorites', [])
+          wx.setStorageSync(app.accountKey('yxzx_favorites'), [])
           this.setData({ favorites: [] })
           wx.showToast({ title: '已清空', icon: 'none' })
         }

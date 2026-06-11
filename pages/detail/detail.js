@@ -44,7 +44,7 @@ Page({
       this.setData({ product, specList })
 
       // 收藏状态
-      const favorites = wx.getStorageSync('yxzx_favorites') || []
+      const favorites = wx.getStorageSync(app.accountKey('yxzx_favorites')) || []
       this.setData({ isFav: favorites.some(f => f.id === id) })
 
       wx.setNavigationBarTitle({
@@ -62,7 +62,7 @@ Page({
 
   toggleFavorite() {
     const { isFav, product, productId } = this.data
-    let favorites = wx.getStorageSync('yxzx_favorites') || []
+    let favorites = wx.getStorageSync(app.accountKey('yxzx_favorites')) || []
     
     if (isFav) {
       favorites = favorites.filter(f => f.id !== productId)
@@ -76,7 +76,7 @@ Page({
       })
       wx.showToast({ title: '加入收藏夹', icon: 'success' })
     }
-    wx.setStorageSync('yxzx_favorites', favorites)
+    wx.setStorageSync(app.accountKey('yxzx_favorites'), favorites)
     this.setData({ isFav: !isFav })
   },
 
@@ -94,7 +94,7 @@ Page({
     })
 
     app.globalData.cart = cart
-    wx.setStorageSync('yxzx_cart', cart)
+    wx.setStorageSync(app.accountKey('yxzx_cart'), cart)
     app.updateCartBadge(cart.length)
     this.updateCartCount()
     wx.showToast({ title: '已加入购物车', icon: 'success' })
