@@ -171,9 +171,11 @@ Page({
   /* ==================== 微信一键登录 ==================== */
 
   /**
-   * 微信一键登录（getPhoneNumber 回调）— 改用 phone-login 一步完成
+   * 微信一键登录（getPhoneNumber 回调）
    * 流程：点按钮 → 微信授权弹窗 → 获取 code →
-   *       API.phoneLogin(code) → 后端解密手机号 + 签发 JWT → 完成登录
+   *       ① phoneLogin(code) → 后端解密手机号 + 签发 JWT
+   *       ② wxLogin() → 获取 openid（支付必须）
+   * 完成后写入 token / user / openid
    */
   async onGetPhone(e) {
     if (e.detail.errMsg && e.detail.errMsg.includes('fail')) {
@@ -188,7 +190,7 @@ Page({
     wx.showLoading({ title: '微信授权中...', mask: true })
 
     try {
-      // ① 一步完成：后端解密手机号 + 签发 JWT
+      // ① phone-login：后端解密手机号 + 签发 JWT
       const loginResult = await API.phoneLogin(e.detail.code)
       const phone = loginResult.phone
       const token = loginResult.token
@@ -197,26 +199,36 @@ Page({
         throw new Error('后端未返回手机号或 token')
       }
 
-      // ② 构建用户信息（优先使用后端返回的 user）
+      // ② 补充获取 openid（微信支付依赖 openid）
+      let openid = ''
+      try {
+        const wxLoginRes = await API.wxLogin()
+        openid = wxLoginRes.openid || ''
+      } catch (_) {
+        // openid 获取失败不阻断登录，但支付时会提示重新授权
+        console.warn('[Login] 获取 openid 失败，支付功能将不可用')
+      }
+
+      // ③ 构建用户信息（优先使用后端返回的 user）
       const existingUser = this.getExistingUser(phone)
       const backendUser = loginResult.user || {}
       const userInfo = existingUser
-        ? { ...existingUser, ...backendUser, lastLogin: new Date().toISOString() }
+        ? { ...existingUser, ...backendUser, openid: openid || existingUser.openid || '', lastLogin: new Date().toISOString() }
         : {
             id: backendUser.id || ('U' + Date.now().toString(36).toUpperCase()),
             nickName: backendUser.name || `甄选会员${phone.slice(-4)}`,
             avatarUrl: '',
             phone,
-            openid: '',
+            openid,
             level: 1,
             registerTime: new Date().toISOString(),
             ...backendUser
           }
 
-      // ③ 写入 token
+      // ④ 写入 token（含 openid）
       const tokenData = {
         token,
-        openid: '',
+        openid,
         phone,
         createdAt: Date.now(),
         expiresAt: Date.now() + TOKEN_EXPIRE_DAYS * 24 * 60 * 60 * 1000
@@ -227,7 +239,7 @@ Page({
 
       app.globalData.isLoggedIn = true
       app.globalData.userInfo = userInfo
-      app.globalData.openid = ''
+      app.globalData.openid = openid
 
       // 按账号隔离数据
       app.onLoginSuccess(phone)
