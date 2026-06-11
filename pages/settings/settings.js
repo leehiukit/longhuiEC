@@ -134,7 +134,7 @@ Page({
       content: '有闲甄选是专注高品质数码好物的精选平台。\n\n'
         + '我们携手各大品牌，为你甄选每一件好物，让品质生活触手可及。\n\n'
         + '版本：v1.0.0\n'
-        + '联系邮箱：service@youxian.com',
+        + '联系邮箱：service@kyrecycle.com',
       showCancel: false,
       confirmText: '我知道了'
     })
