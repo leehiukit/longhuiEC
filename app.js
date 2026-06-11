@@ -24,6 +24,7 @@ const SCOPED_KEYS = [
 App({
   onLaunch() {
     this.migrateStorageKeys()
+    this.initTestData()   // 未归属的演示数据 → 测试账号
     this.erpAutoLogin()  // 自动登录 ERP 拿 token
     this.checkLoginStatus()
     this.initCart()
@@ -64,6 +65,67 @@ App({
         }
       } catch (e) { /* 忽略迁移错误 */ }
     })
+  },
+
+  // 将未归属的演示数据一次性迁移到测试账号（首次启动执行一次）
+  initTestData() {
+    const TEST_PHONE = '13800138000'
+    // 已经迁移过则跳过
+    if (wx.getStorageSync('__test_data_migrated__')) return
+
+    const ALL_KEYS = (() => {
+      try { return (wx.getStorageInfoSync().keys || []) } catch (_) { return [] }
+    })()
+
+    SCOPED_KEYS.forEach(baseKey => {
+      try {
+        const testKey = `${baseKey}_${TEST_PHONE}`
+        let testData = wx.getStorageSync(testKey)
+        if (testData === '' || testData === undefined) testData = null
+
+        // 1. 先收集其他 scoped keys（yxzx_orders_138xxxx 等非测试账号的）迁移到测试账号
+        ALL_KEYS
+          .filter(k => k.startsWith(`${baseKey}_`) && k !== testKey)
+          .forEach(k => {
+            try {
+              const data = wx.getStorageSync(k)
+              if (data && (!Array.isArray(data) || data.length > 0)) {
+                if (Array.isArray(data)) {
+                  testData = Array.isArray(testData) ? [...data, ...testData] : [...data]
+                } else if (typeof data === 'object') {
+                  testData = testData || {}
+                  Object.assign(testData, data)
+                } else {
+                  testData = data
+                }
+                wx.removeStorageSync(k)
+              }
+            } catch (_) { /* */ }
+          })
+
+        // 2. 再迁移 unscoped 全局 key
+        const oldData = wx.getStorageSync(baseKey)
+        if (oldData !== '' && oldData !== undefined && (!Array.isArray(oldData) || oldData.length > 0)) {
+          if (Array.isArray(oldData)) {
+            testData = Array.isArray(testData) ? [...oldData, ...testData] : [...oldData]
+          } else if (typeof oldData === 'object') {
+            testData = testData || {}
+            Object.assign(testData, oldData)
+          } else {
+            testData = testData || oldData
+          }
+          wx.removeStorageSync(baseKey)
+        }
+
+        // 写入测试账号
+        if (testData && (!Array.isArray(testData) || testData.length > 0)) {
+          wx.setStorageSync(testKey, testData)
+        }
+      } catch (_) { /* */ }
+    })
+
+    // 标记已迁移，下次启动不再重复
+    wx.setStorageSync('__test_data_migrated__', true)
   },
 
   // 获取当前账号标识（手机号），未登录返回 null
