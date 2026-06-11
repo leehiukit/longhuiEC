@@ -89,6 +89,38 @@ Authorization: Bearer <token>
 }
 ```
 
+### POST /api/v1/auth/phone-login
+
+手机号一键登录（利用微信手机号组件，无需短信验证码）。
+
+`<button open-type="getPhoneNumber">` 回调拿到 code 后调用，后端解密手机号 → 查/建 User → 签发 JWT。
+
+**Headers:**
+```
+Content-Type: application/json
+```
+
+**Body:**
+| 字段 | 类型 | 必填 | 说明 |
+|------|------|:----:|------|
+| code | string | ✅ | `getPhoneNumber` 回调的 `e.detail.code` |
+
+**Response:**
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiIs...",
+  "phone": "1381234****",
+  "user": {
+    "id": "cmotmhlu50006p7utol2ncig1",
+    "name": "张三",
+    "phone": "1381234****",
+    "role": "CUSTOMER"
+  }
+}
+```
+
+> `phone-login` 与 `wx-login` 签发的 JWT 等效，之后所有需鉴权接口均可正常使用。
+
 ### GET /api/v1/auth/me
 
 获取当前用户信息。
@@ -478,6 +510,24 @@ GET /api/v1/ecommerce/orders?orderNo=EC-20260609-001
 
 > 新增字段：`discountAmount` — 优惠券抵扣金额（元），null 表示未使用优惠券。
 
+### GET /api/v1/ecommerce/orders/export
+
+导出订单为 CSV 文件（UTF-8 BOM，Excel 可直接打开）。
+
+**Query:**
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|:----:|------|
+| status | string | ❌ | 按订单状态筛选（PENDING_PAYMENT / PAID / SHIPPED / DELIVERED / COMPLETED / CANCELLED） |
+| afterSales | string | ❌ | 按售后状态筛选（RETURN_REQUESTED / RETURN_APPROVED / RETURN_SHIPPED / REFUNDING / REFUNDED / RETURN_REJECTED） |
+| q | string | ❌ | 搜索订单号 / 买家姓名 / 手机号 |
+
+**示例:**
+```
+GET /api/v1/ecommerce/orders/export?status=PAID&q=张三
+```
+
+**Response:** `Content-Type: text/csv`，直接下载文件。
+
 ### POST /api/v1/ecommerce/callback
 
 状态同步回调（小程序支付、签收、完成、售后均通过此接口同步到 ERP）。
@@ -674,26 +724,27 @@ Content-Type: multipart/form-data
 | 方法 | 路径 | 鉴权 | 说明 |
 |------|------|:----:|------|
 | POST | `/api/v1/auth/login` | 无 | 邮箱密码登录 |
+| POST | `/api/v1/auth/login` | 无 | 邮箱密码登录 |
 | POST | `/api/v1/auth/wx-login` | 无 | 微信小程序登录 |
+| POST | `/api/v1/auth/phone-login` | 无 | 手机号一键登录 |
 | GET | `/api/v1/auth/me` | Bearer | 获取当前用户 |
 | POST | `/api/v1/auth/phone` | Bearer | 微信手机号解密 |
-| **GET** | **`/api/v1/customers/me`** | Bearer | **客户档案 + 可用优惠券** |
-| **GET** | **`/api/v1/coupons/available`** | Bearer | **查询订单可用优惠券** |
-| **POST** | **`/api/v1/coupons/available`** | Bearer | **使用优惠券抵扣** |
+| GET | `/api/v1/customers/me` | Bearer | 客户档案 + 可用优惠券 |
+| GET | `/api/v1/coupons/available` | Bearer | 查询订单可用优惠券 |
+| POST | `/api/v1/coupons/available` | Bearer | 使用优惠券抵扣 |
 | POST | `/api/v1/payment/unify` | Bearer | 微信支付统一下单 |
 | POST | `/api/v1/payment/notify` | 微信签名 | 支付结果通知 |
-| **POST** | **`/api/v1/payment/refund`** | Bearer | **发起退款** |
+| POST | `/api/v1/payment/refund` | Bearer | 发起退款 |
 | GET | `/api/v1/products` | 无 | 商品列表 |
 | GET | `/api/v1/products/{id}` | 无 | 商品详情 |
 | GET | `/api/v1/devices` | Bearer | 设备列表 |
 | GET | `/api/v1/devices/{id}` | Bearer | 设备详情 |
 | POST | `/api/v1/ecommerce/orders` | Bearer | 创建订单 |
 | GET | `/api/v1/ecommerce/orders` | Bearer | 查询订单 |
+| GET | `/api/v1/ecommerce/orders/export` | Bearer | 导出订单 CSV |
 | POST | `/api/v1/ecommerce/callback` | Bearer | 状态同步回调 |
 | GET | `/api/v1/banners` | 无 | 首页 Banner 列表 |
-| **POST** | **`/api/v1/upload`** | Bearer | **文件上传** |
-
-> **粗体** 为本次新增/更新接口。
+| POST | `/api/v1/upload` | Bearer | 文件上传 |
 
 ---
 

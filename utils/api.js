@@ -120,6 +120,20 @@ function wxLogin() {
 }
 
 /**
+ * 手机号一键登录（推荐）：利用微信 getPhoneNumber 组件返回的 code，
+ * 后端自动解密手机号 → 查/建用户 → 签发 JWT，一步完成。
+ *
+ * 【后端接口规范】
+ * POST /api/v1/auth/phone-login
+ * Body: { code: "getPhoneNumber 回调中 e.detail.code" }
+ *
+ * Response: { token, phone, user: { id, name, phone, role } }
+ */
+function phoneLogin(code) {
+  return erpRequest('POST', '/api/v1/auth/phone-login', { code })
+}
+
+/**
  * 微信手机号授权 → 发送到 ERP 后端解密
  *
  * 【后端接口规范】
@@ -447,6 +461,18 @@ function ecommerceCallback(orderNo, event, extra = {}) {
 }
 
 /**
+ * 导出订单 CSV
+ * GET /api/v1/ecommerce/orders/export?status=xxx&q=xxx
+ */
+function exportOrders(params = {}) {
+  const query = []
+  if (params.status) query.push('status=' + params.status)
+  if (params.afterSales) query.push('afterSales=' + params.afterSales)
+  if (params.q) query.push('q=' + encodeURIComponent(params.q))
+  return userRequest('GET', '/api/v1/ecommerce/orders/export' + (query.length ? '?' + query.join('&') : ''))
+}
+
+/**
  * 退货物流上报 — 客户寄回商品后填写快递单号，同步到 ERP
  *
  * 【后端接口规范（ERP 需实现）】
@@ -560,6 +586,7 @@ function upload(filePath) {
 module.exports = {
   CONFIG,
   wxLogin,
+  phoneLogin,
   adminLogin,
   getMe,
   getPhoneNumber,
@@ -575,6 +602,7 @@ module.exports = {
   getDeviceDetail,
   createEcommerceOrder,
   getEcommerceOrders,
+  exportOrders,
   ecommerceCallback,
   submitReturnTracking,
   paymentRefund,

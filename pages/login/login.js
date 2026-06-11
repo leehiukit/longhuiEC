@@ -171,9 +171,9 @@ Page({
   /* ==================== 微信一键登录 ==================== */
 
   /**
-   * 微信一键登录（getPhoneNumber 回调）
-   * 流程：点按钮 → 微信授权弹窗 → 获取加密手机号 →
-   *       API.getPhoneNumber 解密（或模拟）→ wx.login 获取 openid → 完成登录
+   * 微信一键登录（getPhoneNumber 回调）— 改用 phone-login 一步完成
+   * 流程：点按钮 → 微信授权弹窗 → 获取 code →
+   *       API.phoneLogin(code) → 后端解密手机号 + 签发 JWT → 完成登录
    */
   async onGetPhone(e) {
     if (e.detail.errMsg && e.detail.errMsg.includes('fail')) {
@@ -188,30 +188,35 @@ Page({
     wx.showLoading({ title: '微信授权中...', mask: true })
 
     try {
-      // ① 先调 wx.login 获取用户 token（后续接口需要）
-      const loginResult = await API.wxLogin()
+      // ① 一步完成：后端解密手机号 + 签发 JWT
+      const loginResult = await API.phoneLogin(e.detail.code)
+      const phone = loginResult.phone
+      const token = loginResult.token
 
-      // ② 再用 token 解密手机号
-      const phoneResult = await API.getPhoneNumber(e)
-      const phone = phoneResult.phoneNumber
-
-      // ③ 构建用户信息
-      const existingUser = this.getExistingUser(phone)
-      const userInfo = existingUser ? { ...existingUser, lastLogin: new Date().toISOString() } : {
-        id: 'U' + Date.now().toString(36).toUpperCase(),
-        nickName: `甄选会员${phone.slice(-4)}`,
-        avatarUrl: '',
-        phone,
-        openid: loginResult.openid,
-        level: 1,
-        registerTime: new Date().toISOString()
+      if (!phone || !token) {
+        throw new Error('后端未返回手机号或 token')
       }
-      if (!userInfo.openid) userInfo.openid = loginResult.openid
 
-      // ④ 写入 token
+      // ② 构建用户信息（优先使用后端返回的 user）
+      const existingUser = this.getExistingUser(phone)
+      const backendUser = loginResult.user || {}
+      const userInfo = existingUser
+        ? { ...existingUser, ...backendUser, lastLogin: new Date().toISOString() }
+        : {
+            id: backendUser.id || ('U' + Date.now().toString(36).toUpperCase()),
+            nickName: backendUser.name || `甄选会员${phone.slice(-4)}`,
+            avatarUrl: '',
+            phone,
+            openid: '',
+            level: 1,
+            registerTime: new Date().toISOString(),
+            ...backendUser
+          }
+
+      // ③ 写入 token
       const tokenData = {
-        token: loginResult.token,
-        openid: loginResult.openid,
+        token,
+        openid: '',
         phone,
         createdAt: Date.now(),
         expiresAt: Date.now() + TOKEN_EXPIRE_DAYS * 24 * 60 * 60 * 1000
@@ -222,7 +227,7 @@ Page({
 
       app.globalData.isLoggedIn = true
       app.globalData.userInfo = userInfo
-      app.globalData.openid = loginResult.openid
+      app.globalData.openid = ''
 
       // 按账号隔离数据
       app.onLoginSuccess(phone)
