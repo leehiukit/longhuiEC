@@ -205,3 +205,56 @@
 }
 .btn-pay-confirm::after { border: none; }
 .btn-pay-confirm[disabled] { opacity: 0.5; }
+
+/* ========== 支付弹层内优惠券 ========== */
+.pay-coupon-section {
+  padding: 0 28rpx;
+  margin-bottom: 12rpx;
+}
+.pay-coupon-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 16rpx;
+  font-size: 24rpx; color: #999;
+}
+.pay-coupon-loading { color: #E8952A; font-size: 22rpx; }
+
+.selected-coupon {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 18rpx 20rpx;
+  background: #fdf6ec; border-radius: 12rpx;
+  border: 1rpx solid #f0d6a0;
+}
+.selected-coupon-text { font-size: 25rpx; color: #E8952A; font-weight: 500; }
+.coupon-remove { font-size: 22rpx; color: #999; padding: 6rpx 14rpx; }
+
+.coupon-list {
+  max-height: 260rpx;
+  overflow-y: auto;
+}
+.coupon-item {
+  display: flex; align-items: center;
+  padding: 18rpx 20rpx;
+  margin-bottom: 10rpx;
+  background: #fdf8f0; border-radius: 12rpx;
+  border: 1rpx solid #f6e8d0;
+  transition: border-color 0.2s;
+}
+.coupon-item.selected { border-color: #E8952A; background: #fef5e7; }
+
+.coupon-item-left {
+  width: 140rpx; text-align: center;
+  padding-right: 20rpx; border-right: 1rpx dashed #e8d5b0;
+  flex-shrink: 0;
+}
+.coupon-amount-text { font-size: 24rpx; color: #E8952A; font-weight: bold; display: block; }
+.coupon-amount-text .num { font-size: 38rpx; }
+.coupon-condition-text { font-size: 20rpx; color: #ba8a5a; display: block; margin-top: 4rpx; }
+
+.coupon-item-right {
+  flex: 1; padding-left: 20rpx;
+  display: flex; flex-direction: column; justify-content: center;
+}
+.coupon-title-text { font-size: 26rpx; color: #333; font-weight: 500; }
+.coupon-scope-text { font-size: 21rpx; color: #999; margin-top: 4rpx; }
+
+.no-coupon { color: #ccc; font-size: 22rpx; }

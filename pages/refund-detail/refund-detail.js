@@ -52,25 +52,73 @@ Page({
       try {
         const erp = await API.getEcommerceOrders({ orderNo: order.orderNo })
         if (erp) {
-          // ERP 退款相关状态同步到本地退款记录
-          if (erp.status === 'REFUNDED' || erp.status === 'CANCELLED') {
-            refund.status = 'refunded'
-            refund.updateTime = new Date().toISOString()
-            if (!refund.timeline || !refund.timeline.some(t => t.text.includes('已到账'))) {
+          // ERP 售后状态映射
+          const erpStatus = erp.afterSalesStatus || erp.status || ''
+          console.log('[退款详情] ERP 状态:', erpStatus, '本地状态:', refund.status)
+
+          if (erpStatus === 'REFUNDED') {
+            if (refund.status !== 'refunded') {
+              refund.status = 'refunded'
+              refund.updateTime = new Date().toISOString()
+              if (!refund.timeline || !refund.timeline.some(t => t.text.includes('已到账'))) {
+                refund.timeline = refund.timeline || []
+                refund.timeline.push({
+                  time: new Date().toISOString(),
+                  text: '退款已到账，售后完成',
+                  done: true
+                })
+              }
+              app.saveRefunds(refunds)
+              // 同步订单
+              const orders = app.getOrders()
+              const o = orders.find(it => it.id === refund.orderId)
+              if (o) {
+                o.refundStatus = 'refunded'
+                o.status = 'afterSale'
+                app.saveOrders(orders)
+              }
+            }
+          } else if (erpStatus === 'REFUNDING') {
+            // 退款处理中，本地保持 pending
+            if (!refund.timeline || !refund.timeline.some(t => t.text.includes('退款处理中'))) {
               refund.timeline = refund.timeline || []
               refund.timeline.push({
                 time: new Date().toISOString(),
-                text: '退款已到账，售后完成',
-                done: true
+                text: '退款处理中，预计1-3个工作日到账',
+                done: false
               })
+              app.saveRefunds(refunds)
             }
+          } else if (erpStatus === 'RETURN_APPROVED' && refund.status === 'pending') {
+            refund.status = 'approved'
+            refund.updateTime = new Date().toISOString()
+            refund.timeline = refund.timeline || []
+            refund.timeline.push({
+              time: new Date().toISOString(),
+              text: '商家已同意退款申请',
+              done: true
+            })
             app.saveRefunds(refunds)
-          } else if (erp.status === 'RETURN_REQUESTED' && refund.status === 'pending') {
-            // 保持 pending，ERP 已收到请求
+          } else if (erpStatus === 'RETURN_REJECTED' && refund.status === 'pending') {
+            refund.status = 'rejected'
+            refund.rejectReason = erp.returnRejectReason || '不符合退款条件'
+            refund.updateTime = new Date().toISOString()
+            refund.timeline = refund.timeline || []
+            refund.timeline.push({
+              time: new Date().toISOString(),
+              text: `商家已拒绝退款：${refund.rejectReason}`,
+              done: true
+            })
+            app.saveRefunds(refunds)
           }
+
           // 同步金额（防止本地为空）
           if (!refund.amount && (erp.totalAmount || erp.subtotalAmount)) {
             refund.amount = erp.totalAmount || erp.subtotalAmount || 0
+            app.saveRefunds(refunds)
+          }
+          if (erp.refundAmount != null && refund.amount !== erp.refundAmount) {
+            refund.amount = erp.refundAmount
             app.saveRefunds(refunds)
           }
         }

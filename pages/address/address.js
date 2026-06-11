@@ -1,30 +1,6 @@
 // 地址管理逻辑
 const app = getApp()
 
-// 默认演示地址（缓存为空时自动填充）
-const DEFAULT_ADDRESSES = [
-  {
-    id: 'default_addr_1',
-    name: '张三',
-    phone: '138****6789',
-    province: '广东省',
-    city: '深圳市',
-    district: '南山区',
-    detail: '科技园南路 XX 号 XX 大厦 XX 层',
-    isDefault: true
-  },
-  {
-    id: 'default_addr_2',
-    name: '李四',
-    phone: '139****1234',
-    province: '北京市',
-    city: '北京市',
-    district: '朝阳区',
-    detail: '建国路 XX 号 XX 小区 X 栋 XXXX',
-    isDefault: false
-  }
-]
-
 Page({
   data: {
     addresses: [],
@@ -53,10 +29,11 @@ Page({
   },
 
   loadAddresses() {
-    let addresses = wx.getStorageSync('yxzx_addresses')
-    // 缓存为空时自动写入默认演示地址
-    if (!addresses || addresses.length === 0) {
-      addresses = DEFAULT_ADDRESSES
+    let addresses = wx.getStorageSync('yxzx_addresses') || []
+    // 清理历史遗留的演示地址
+    const before = addresses.length
+    addresses = addresses.filter(a => a.id !== 'default_addr_1' && a.id !== 'default_addr_2')
+    if (addresses.length !== before) {
       wx.setStorageSync('yxzx_addresses', addresses)
     }
     this.setData({ addresses })

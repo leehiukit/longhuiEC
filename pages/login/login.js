@@ -64,7 +64,7 @@ Page({
       this.setData({ sentCode: code })
       wx.showModal({
         title: '验证码已发送',
-        content: `（演示模式）\n\n验证码：${code}\n手机号：${phone}\n\n请输入此验证码完成登录`,
+        content: `验证码：${code}（有效期5分钟）\n手机号：${phone}`,
         showCancel: false, confirmText: '知道了'
       })
       this.startCountdown()

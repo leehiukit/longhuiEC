@@ -172,10 +172,31 @@ Page({
       })
 
       // 通知 ERP（仅退款 / 退货退款统一走 RETURN_REQUESTED）
-      if (this.data.order.orderNo) {
-        API.ecommerceCallback(this.data.order.orderNo, 'RETURN_REQUESTED', {
+      const orderNo = this.data.order.orderNo
+      if (orderNo) {
+        // ① 先通知 ERP 售后状态
+        API.ecommerceCallback(orderNo, 'RETURN_REQUESTED', {
           returnReason: REFUND_REASONS[reasonIndex]
-        }).catch(() => {})
+        }).then(() => {
+          // ② 仅退款（未发货）→ 直接调用退款接口原路退钱
+          if (this.data.refundType === 'refund') {
+            console.log('[退款] 仅退款，直接发起微信退款:', orderNo, refundAmount)
+            API.paymentRefund(orderNo, refundAmount, REFUND_REASONS[reasonIndex])
+              .then(refundRes => {
+                console.log('[退款] 退款成功:', JSON.stringify(refundRes))
+                // 更新本地退款状态
+                app.updateRefundStatus(refund.id, 'refunded', {
+                  refundAmount: refundRes.refundAmount || refundAmount,
+                  erpRefundId: refundRes.refundId
+                })
+              })
+              .catch(err => {
+                console.error('[退款] 退款接口失败:', err.message || err)
+              })
+          }
+        }).catch(err => {
+          console.error('[退款] ERP 回调失败:', err.message || err)
+        })
       }
 
       this.setData({ submitting: false })

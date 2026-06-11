@@ -34,7 +34,22 @@ function erpRequest(method, url, data, opts = {}) {
         if (res.statusCode >= 200 && res.statusCode < 300) {
           resolve(res.data)
         } else {
-          reject(new Error((res.data && res.data.message) || '请求失败 (' + res.statusCode + ')'))
+          // 提取 ERP 返回的详细错误信息
+          let errMsg = ''
+          const body = res.data
+          if (typeof body === 'string') {
+            errMsg = body.slice(0, 200)
+          } else if (body && body.message) {
+            errMsg = body.message
+          } else if (body && body.error) {
+            errMsg = body.error
+          } else if (body && body.errmsg) {
+            errMsg = body.errmsg
+          }
+          if (!errMsg) errMsg = '请求失败 (' + res.statusCode + ')'
+          // 附加调试信息（控制台可见）
+          console.error('[ERP] ' + method + ' ' + url, 'status=' + res.statusCode, 'body=', JSON.stringify(res.data).slice(0, 300))
+          reject(new Error(errMsg))
         }
       },
       fail(err) { reject(err) }
@@ -349,10 +364,19 @@ async function getCategories() {
  * GET /api/v1/banners（无需认证）
  */
 async function getBanners() {
+  // 本地默认 Banner 兜底
+  const LOCAL_BANNERS = [
+    { id: 'b1', title: '🔥 热销爆款', desc: '甄选人气TOP · 销量口碑双冠', color: '#E74C3C', productId: '', imageUrl: '', sortOrder: 0 },
+    { id: 'b2', title: '🆕 最近上新', desc: '2024新款笔记本 · 抢先体验', color: '#2ECC71', productId: '', imageUrl: '', sortOrder: 1 },
+    { id: 'b3', title: '⚡ 限时特惠', desc: '精选好物直降 · 手慢无', color: '#F39C12', productId: '', imageUrl: '', sortOrder: 2 }
+  ]
+
   try {
     const res = await erpRequest('GET', '/api/v1/banners')
     // ERP 返回数组
     const list = (Array.isArray(res) ? res : (res.data || res.items || []))
+    if (!list.length) return { code: 0, data: LOCAL_BANNERS }  // ERP 无数据时兜底
+
     // 按 sortOrder 升序排列
     list.sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0))
     // 处理图片 & 补全字段
@@ -369,14 +393,7 @@ async function getBanners() {
     return { code: 0, data }
   } catch (e) {
     // ERP 不可用时回退本地 Banner
-    return {
-      code: 0,
-      data: [
-        { id: 'b1', title: '🔥 热销爆款', desc: '甄选人气TOP · 销量口碑双冠', color: '#E74C3C', productId: '', imageUrl: '', sortOrder: 0 },
-        { id: 'b2', title: '🆕 最近上新', desc: '2024新款笔记本 · 抢先体验', color: '#2ECC71', productId: '', imageUrl: '', sortOrder: 1 },
-        { id: 'b3', title: '⚡ 限时特惠', desc: '精选好物直降 · 手慢无', color: '#F39C12', productId: '', imageUrl: '', sortOrder: 2 }
-      ]
-    }
+    return { code: 0, data: LOCAL_BANNERS }
   }
 }
 
@@ -440,11 +457,6 @@ function ecommerceCallback(orderNo, event, extra = {}) {
  *   carrier: "顺丰速运",
  *   trackingNumber: "SF1234567890"
  * }
- *
- * ERP 后端需做的事情：
- * 1. 校验订单状态为 RETURN_APPROVED
- * 2. 记录退货物流单号
- * 3. 将售后状态更新为 RETURNING
  */
 function submitReturnTracking(orderNo, carrier, trackingNumber) {
   return userRequest('POST', '/api/v1/ecommerce/callback', {
@@ -453,6 +465,31 @@ function submitReturnTracking(orderNo, carrier, trackingNumber) {
     returnCarrier: carrier || '顺丰速运',
     returnTrackingNumber: trackingNumber
   })
+}
+
+/**
+ * 发起退款 — 调用微信退款接口，从原支付路径退回款项
+ *
+ * 【后端接口规范】
+ * POST /api/v1/payment/refund
+ * Body: {
+ *   orderNo: "EC-20260609-001",
+ *   refundAmount: 99.00,    // 可选，默认全额退款
+ *   reason: "用户申请退款"   // 可选
+ * }
+ *
+ * 后端会：
+ * 1. 校验订单状态（PAID / SHIPPED / DELIVERED / COMPLETED）
+ * 2. 调用微信退款接口
+ * 3. 更新订单售后状态为 REFUNDED 或 REFUNDING
+ *
+ * Response: { refundId, outRefundNo, status, refundAmount, afterSalesStatus }
+ */
+function paymentRefund(orderNo, refundAmount, reason) {
+  const body = { orderNo }
+  if (refundAmount != null) body.refundAmount = refundAmount
+  if (reason) body.reason = reason
+  return userRequest('POST', '/api/v1/payment/refund', body)
 }
 
 /* ==================== 客户档案（对接 ERP） ==================== */
@@ -484,6 +521,40 @@ function useCoupon(couponId, orderId) {
   return userRequest('POST', '/api/v1/coupons/available', { couponId, orderId })
 }
 
+/* ==================== 文件上传（需 Bearer token） ==================== */
+
+/**
+ * 上传图片文件
+ * POST /api/v1/upload (multipart/form-data, field: file)
+ * 返回: { url: "/uploads/products/xxx.png" }
+ */
+function upload(filePath) {
+  return new Promise((resolve, reject) => {
+    const token = wx.getStorageSync(CONFIG.USER_TOKEN_KEY)
+    wx.uploadFile({
+      url: CONFIG.BASE_URL + '/api/v1/upload',
+      filePath,
+      name: 'file',
+      header: {
+        'Authorization': token?.token ? 'Bearer ' + token.token : ''
+      },
+      success(res) {
+        try {
+          const data = JSON.parse(res.data)
+          if (data.url) {
+            resolve(data)
+          } else {
+            reject(new Error(data.message || '上传失败'))
+          }
+        } catch {
+          reject(new Error('解析响应失败'))
+        }
+      },
+      fail(err) { reject(err) }
+    })
+  })
+}
+
 /* ==================== 导出 ==================== */
 
 module.exports = {
@@ -506,7 +577,9 @@ module.exports = {
   getEcommerceOrders,
   ecommerceCallback,
   submitReturnTracking,
+  paymentRefund,
   getCustomerProfile,
   getAvailableCoupons,
-  useCoupon
+  useCoupon,
+  upload
 }

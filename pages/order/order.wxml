@@ -38,17 +38,6 @@
     </view>
   </view>
 
-  <!-- 优惠券 -->
-  <view class="coupon-section" bindtap="selectCoupon">
-    <text>优惠券</text>
-    <view class="coupon-right">
-      <text class="coupon-value" wx:if="{{coupon}}">-¥{{coupon.amount}}</text>
-      <text class="no-coupon" wx:else>{{coupons.length > 0 ? coupons.length + '张可用' : '暂无可用'}}</text>
-      <view class="coupon-clear" wx:if="{{coupon}}" catchtap="clearCoupon">✕</view>
-      <text class="arrow">›</text>
-    </view>
-  </view>
-
   <!-- 订单备注 -->
   <view class="remark-section">
     <text>订单备注</text>
@@ -95,6 +84,41 @@
         <text class="pay-title">确认支付</text>
         <text class="pay-amount">¥{{finalPrice}}</text>
         <text class="pay-close" bindtap="closePayment">✕</text>
+      </view>
+
+      <!-- 优惠券选择（支付弹层内，Step 6-8） -->
+      <view class="pay-coupon-section">
+        <view class="pay-coupon-header">
+          <text>优惠券</text>
+          <text class="pay-coupon-loading" wx:if="{{loadingCoupons}}">加载中...</text>
+          <text class="no-coupon" wx:elif="{{!coupon && coupons.length === 0}}">暂无可用</text>
+        </view>
+
+        <!-- 已选优惠券 -->
+        <view class="selected-coupon" wx:if="{{coupon}}">
+          <text class="selected-coupon-text">✓ {{coupon.title}} -¥{{coupon.amount}}</text>
+          <text class="coupon-remove" bindtap="clearPaymentCoupon">不使用</text>
+        </view>
+
+        <!-- 可用券列表 -->
+        <view class="coupon-list" wx:if="{{!coupon && coupons.length > 0}}">
+          <view
+            class="coupon-item"
+            wx:for="{{coupons}}"
+            wx:key="id"
+            bindtap="selectPaymentCoupon"
+            data-coupon="{{item}}"
+          >
+            <view class="coupon-item-left">
+              <text class="coupon-amount-text">¥<text class="num">{{item.amount}}</text></text>
+              <text class="coupon-condition-text">{{item.condition}}</text>
+            </view>
+            <view class="coupon-item-right">
+              <text class="coupon-title-text">{{item.title}}</text>
+              <text class="coupon-scope-text">{{item.scope === 'ALL_PRODUCTS' ? '全部商品' : '指定商品'}}</text>
+            </view>
+          </view>
+        </view>
       </view>
 
       <!-- 支付方式 -->

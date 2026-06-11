@@ -1,72 +1,63 @@
-// 优惠券
+// 优惠券（对接 ERP）
 const app = getApp()
-
-// 模拟优惠券数据
-const MOCK_COUPONS = [
-  {
-    id: 'cp1',
-    title: '新人专享券',
-    amount: 20,
-    condition: '满200元可用',
-    range: '全部商品',
-    expireDate: '2026-12-31',
-    status: 'valid'
-  },
-  {
-    id: 'cp2',
-    title: '笔记本品类券',
-    amount: 100,
-    condition: '满2000元可用',
-    range: '笔记本类目',
-    expireDate: '2026-09-30',
-    status: 'valid'
-  },
-  {
-    id: 'cp3',
-    title: '618大促券',
-    amount: 50,
-    condition: '满500元可用',
-    range: '全部商品',
-    expireDate: '2026-06-18',
-    status: 'used',
-    usedDate: '2026-06-09'
-  },
-  {
-    id: 'cp4',
-    title: '五一专项券',
-    amount: 30,
-    condition: '无门槛',
-    range: '全部商品',
-    expireDate: '2026-05-05',
-    status: 'expired'
-  }
-]
+const API = require('../../utils/api')
 
 Page({
   data: {
     activeTab: 'valid',
     validCoupons: [],
     usedCoupons: [],
-    expiredCoupons: []
+    expiredCoupons: [],
+    loading: false
   },
 
   onShow() {
     this.loadCoupons()
   },
 
-  loadCoupons() {
-    // 合并本地已使用的券与模拟数据
-    const localUsed = wx.getStorageSync('yxzx_used_coupons') || []
-    const allCoupons = MOCK_COUPONS.map(c => {
-      if (localUsed.includes(c.id)) return { ...c, status: 'used', usedDate: '已使用' }
-      return c
-    })
+  async loadCoupons() {
+    this.setData({ loading: true })
+    try {
+      const phone = (wx.getStorageSync('yxzx_user') || {}).phone
+      if (!phone) {
+        this.setData({ loading: false, validCoupons: [], usedCoupons: [], expiredCoupons: [] })
+        return
+      }
 
-    this.setData({
-      validCoupons: allCoupons.filter(c => c.status === 'valid'),
-      usedCoupons: allCoupons.filter(c => c.status === 'used'),
-      expiredCoupons: allCoupons.filter(c => c.status === 'expired')
-    })
+      const profileRes = await API.getCustomerProfile(phone)
+      const customer = profileRes.customer
+      const availableList = customer?.availableCoupons || []
+
+      const formatCoupon = (c, extra = {}) => ({
+        id: c.id,
+        title: c.name,
+        type: c.type,
+        value: c.value,
+        amount: c.type === 'FIXED_AMOUNT' ? c.value : 0,
+        condition: c.minOrderAmount > 0 ? `满${c.minOrderAmount}元可用` : '无门槛',
+        range: c.scope === 'ALL_PRODUCTS' ? '全部商品' : (c.scope || '指定商品'),
+        expireDate: c.expiresAt ? c.expiresAt.split('T')[0] : '长期有效',
+        status: 'valid',
+        ...extra
+      })
+
+      const now = new Date()
+      const validCoupons = []
+      const expiredCoupons = []
+
+      availableList.forEach(c => {
+        const isExpired = c.expiresAt && new Date(c.expiresAt) < now
+        if (isExpired) {
+          expiredCoupons.push(formatCoupon(c, { status: 'expired' }))
+        } else {
+          validCoupons.push(formatCoupon(c))
+        }
+      })
+
+      this.setData({ validCoupons, usedCoupons: [], expiredCoupons, loading: false })
+    } catch (e) {
+      this.setData({ loading: false })
+    }
   },
 
   switchTab(e) {
@@ -77,7 +68,7 @@ Page({
     wx.switchTab({ url: '/pages/index/index' })
   },
 
-  // 选中优惠券并返回订单页
+  // 选中优惠券并返回订单页（保留兼容）
   selectCoupon(e) {
     const coupon = e.currentTarget.dataset.coupon
     wx.setStorageSync('yxzx_selected_coupon', coupon)

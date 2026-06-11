@@ -603,6 +603,44 @@ GET https://erp.qixiangshou.com/api/v1/banners
 | imageUrl | string | 背景图片 URL（可能为 null） |
 | sortOrder | number | 排序序号 |
 
+### POST /api/v1/payment/refund
+
+发起退款，调用微信退款接口从原支付路径退回。
+
+> 仅支持 `PAID` / `SHIPPED` / `DELIVERED` / `COMPLETED` 状态的订单。
+
+**Headers:**
+```
+Content-Type: application/json
+Authorization: Bearer <token>
+```
+
+**Body:**
+| 字段 | 类型 | 必填 | 说明 |
+|------|------|:----:|------|
+| orderNo | string | ✅ | 电商订单号 |
+| refundAmount | number | ❌ | 退款金额（元），默认全额退款 |
+| reason | string | ❌ | 退款原因，默认「用户申请退款」 |
+
+**Response:**
+```json
+{
+  "refundId": "503000003220250611...",
+  "outRefundNo": "EC-20260609-001-R1718112000000",
+  "status": "SUCCESS",
+  "refundAmount": 99,
+  "afterSalesStatus": "REFUNDED"
+}
+```
+
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| refundId | string | 微信支付退款单号 |
+| outRefundNo | string | 商户退款单号 |
+| status | string | 退款状态：`SUCCESS` / `PROCESSING` |
+| refundAmount | number | 实际退款金额（元） |
+| afterSalesStatus | string | 订单售后状态：`REFUNDED` / `REFUNDING` |
+
 ---
 
 ## 文件上传（需 Bearer token）
@@ -644,6 +682,7 @@ Content-Type: multipart/form-data
 | **POST** | **`/api/v1/coupons/available`** | Bearer | **使用优惠券抵扣** |
 | POST | `/api/v1/payment/unify` | Bearer | 微信支付统一下单 |
 | POST | `/api/v1/payment/notify` | 微信签名 | 支付结果通知 |
+| **POST** | **`/api/v1/payment/refund`** | Bearer | **发起退款** |
 | GET | `/api/v1/products` | 无 | 商品列表 |
 | GET | `/api/v1/products/{id}` | 无 | 商品详情 |
 | GET | `/api/v1/devices` | Bearer | 设备列表 |
