@@ -1,0 +1,129 @@
+<!-- 退款/售后申请 - 有闲甄选 -->
+<view class="page" wx:if="{{order}}">
+
+  <!-- 订单摘要 -->
+  <view class="order-brief">
+    <image class="brief-img" src="{{order.items[0].image}}" mode="aspectFill" />
+    <view class="brief-info">
+      <text class="brief-title ellipsis">{{order.items[0].title}}</text>
+      <text class="brief-price">实付 ¥{{order.finalPrice.toFixed(2)}}</text>
+    </view>
+  </view>
+
+  <!-- 退款类型（根据订单状态自动筛选） -->
+  <view class="section">
+    <view class="section-title">退款类型</view>
+
+    <!-- 超期提示：已完成超过7天不可退货 -->
+    <view class="expired-notice" wx:if="{{returnExpired}}">
+      <text class="expired-icon">⏰</text>
+      <text class="expired-text">订单已完成超过 7 天，暂不支持退货退款。如有疑问请联系客服。</text>
+    </view>
+
+    <view class="type-row" wx:else>
+      <!-- 仅退款：仅已付款未发货的订单可选 -->
+      <block wx:if="{{showRefundOnly}}">
+        <view
+          class="type-item {{refundType === 'refund' ? 'active' : ''}}"
+          data-type="refund"
+          bindtap="switchType"
+        >
+          <text class="type-icon">💰</text>
+          <text class="type-name">仅退款</text>
+          <text class="type-desc">未收到货或协商一致</text>
+          <view class="type-check {{refundType === 'refund' ? 'on' : ''}}"></view>
+        </view>
+      </block>
+
+      <!-- 退货退款：已发货 / 已签收 / 已完成 的订单可选 -->
+      <block wx:if="{{showReturnRefund}}">
+        <view
+          class="type-item {{refundType === 'return' ? 'active' : ''}}"
+          data-type="return"
+          bindtap="switchType"
+        >
+          <text class="type-icon">📦</text>
+          <text class="type-name">退货退款</text>
+          <text class="type-desc">已收到货需退回商品</text>
+          <view class="type-check {{refundType === 'return' ? 'on' : ''}}"></view>
+        </view>
+      </block>
+    </view>
+  </view>
+
+  <!-- 退款原因 -->
+  <view class="section">
+    <view class="section-title">退款原因 <text class="required">*</text></view>
+    <view class="reason-grid">
+      <view
+        wx:for="{{reasons}}" wx:key="*this"
+        class="reason-tag {{reasonIndex === index ? 'active' : ''}}"
+        data-index="{{index}}"
+        bindtap="selectReason"
+      >{{item}}</view>
+    </view>
+  </view>
+
+  <!-- 退款金额 -->
+  <view class="section">
+    <view class="section-title">退款金额 <text class="required">*</text></view>
+    <view class="amount-row">
+      <text class="amount-symbol">¥</text>
+      <input
+        class="amount-input"
+        type="digit"
+        value="{{refundAmount}}"
+        placeholder="请输入退款金额"
+        bindinput="onAmountInput"
+      />
+      <text class="amount-max">最多 ¥{{maxAmount.toFixed(2)}}</text>
+    </view>
+  </view>
+
+  <!-- 问题描述 -->
+  <view class="section">
+    <view class="section-title">补充说明</view>
+    <textarea
+      class="desc-input"
+      value="{{description}}"
+      placeholder="请详细描述退款原因，便于快速处理（选填）"
+      maxlength="500"
+      bindinput="onDescInput"
+    />
+    <text class="desc-count">{{description.length}}/500</text>
+  </view>
+
+  <!-- 上传凭证 -->
+  <view class="section">
+    <view class="section-title">上传凭证（选填）</view>
+    <view class="image-grid">
+      <view
+        wx:for="{{images}}" wx:key="*this"
+        class="image-cell"
+        data-src="{{item}}"
+        data-index="{{index}}"
+      >
+        <image class="proof-img" src="{{item}}" mode="aspectFill" bindtap="previewImage" />
+        <view class="delete-btn" data-index="{{index}}" catchtap="deleteImage">✕</view>
+      </view>
+      <view class="image-cell add-btn" bindtap="chooseImage" wx:if="{{images.length < 6}}">
+        <text class="add-icon">+</text>
+        <text class="add-text">上传图片</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 协议 -->
+  <view class="agreement">
+    <text>提交即表示同意</text>
+    <text class="link">《有闲甄选售后政策》</text>
+  </view>
+
+  <!-- 提交按钮 -->
+  <view class="submit-area safe-area-bottom">
+    <button class="btn-submit" bindtap="submitRefund" loading="{{submitting}}">
+      提交申请
+    </button>
+  </view>
+
+</view>

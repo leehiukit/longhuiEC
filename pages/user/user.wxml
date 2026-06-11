@@ -1,0 +1,113 @@
+<!-- 用户中心 - 有闲甄选 -->
+<view class="page">
+  <!-- 顶部品牌头部 -->
+  <view class="header">
+    <view class="header-bg"></view>
+    <view class="header-content">
+      <!-- 用户信息 -->
+      <view class="user-info" wx:if="{{isLoggedIn}}" bindtap="goProfile">
+        <image class="avatar" src="{{userInfo.avatarUrl || '/images/default-avatar.png'}}" />
+        <view class="info-text">
+          <text class="nickname">{{userInfo.nickName || '甄选会员'}}</text>
+          <text class="user-level">Lv.{{userInfo.level || 1}} · 甄选达人</text>
+        </view>
+        <text class="edit-icon">›</text>
+      </view>
+      
+      <!-- 未登录提示 -->
+      <view class="login-tip" wx:else bindtap="goLogin">
+        <image class="avatar avatar-guest" src="/images/default-avatar.png" />
+        <view class="info-text">
+          <text class="nickname">点击登录</text>
+          <text class="user-level">登录享更多权益</text>
+        </view>
+        <text class="edit-icon">›</text>
+      </view>
+
+      <!-- 品牌标语 -->
+      <view class="slogan-bar">
+        <text class="slogan-brand">有闲甄选</text>
+        <text class="slogan-dot">·</text>
+        <text class="slogan-text">品质好物 甄心严选</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 统计数据 -->
+  <view class="stats-card">
+    <view class="stat-item" bindtap="goOrders" data-status="">
+      <text class="stat-num">{{stats.orderCount || 0}}</text>
+      <text class="stat-label">全部订单</text>
+    </view>
+    <view class="stat-divider"></view>
+    <view class="stat-item" bindtap="goOrders" data-status="pending">
+      <text class="stat-num text-warning">{{stats.pendingCount || 0}}</text>
+      <text class="stat-label">待付款</text>
+    </view>
+    <view class="stat-divider"></view>
+    <view class="stat-item" bindtap="goOrders" data-status="shipped">
+      <text class="stat-num">{{stats.shippedCount || 0}}</text>
+      <text class="stat-label">待收货</text>
+    </view>
+    <view class="stat-divider"></view>
+    <view class="stat-item" bindtap="goOrders" data-status="completed">
+      <text class="stat-num">{{stats.completedCount || 0}}</text>
+      <text class="stat-label">已完成</text>
+    </view>
+  </view>
+
+  <!-- 订单入口 -->
+  <view class="section order-section">
+    <view class="section-header" bindtap="goOrders" data-status="">
+      <text>我的订单</text>
+      <text class="arrow">查看全部 ›</text>
+    </view>
+    <view class="order-tabs">
+      <view 
+        class="tab-item" 
+        wx:for="{{orderTabs}}" 
+        wx:key="status" 
+        bindtap="goOrders" 
+        data-status="{{item.status}}"
+      >
+        <text class="tab-icon">{{item.icon}}</text>
+        <text>{{item.label}}</text>
+        <view class="tab-badge" wx:if="{{item.count > 0}}">{{item.count}}</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 功能菜单 -->
+  <view class="section menu-section">
+    <view
+      class="menu-item"
+      wx:for="{{menus}}"
+      wx:key="label"
+      bindtap="handleMenu"
+      data-url="{{item.url}}"
+    >
+      <view class="menu-left">
+        <text class="menu-icon" style="color: {{item.color}};">{{item.icon}}</text>
+        <text>{{item.label}}</text>
+        <text class="menu-desc" wx:if="{{item.desc}}">{{item.desc}}</text>
+      </view>
+      <text class="arrow">›</text>
+    </view>
+  </view>
+
+  <!-- 客服 -->
+  <view class="contact-section">
+    <button class="contact-btn" open-type="contact">联系有闲甄选客服</button>
+  </view>
+
+  <!-- 退出登录 -->
+  <view class="logout-section" wx:if="{{isLoggedIn}}">
+    <view class="logout-btn" bindtap="handleLogout">退出登录</view>
+  </view>
+
+  <!-- 底部版权 -->
+  <view class="footer">
+    <text class="footer-brand">有闲甄选 Selection in Idle</text>
+    <text class="footer-copy">© 2026 有闲甄选 All Rights Reserved</text>
+  </view>
+</view>

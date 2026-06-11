@@ -1,0 +1,172 @@
+/* ========== 退款详情页 ========== */
+.page {
+  min-height: 100vh;
+  background: #faf8f5;
+  padding-bottom: 160rpx;
+}
+
+/* 状态卡片 */
+.status-card {
+  margin: 0 0 12rpx;
+  padding: 48rpx 32rpx 36rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #fff;
+}
+.status-icon { font-size: 80rpx; margin-bottom: 16rpx; }
+.status-label { font-size: 34rpx; font-weight: bold; margin-bottom: 10rpx; }
+.status-desc { font-size: 25rpx; color: #999; margin-bottom: 28rpx; }
+
+.refund-amount { text-align: center; }
+.amount-label { font-size: 24rpx; color: #bbb; display: block; margin-bottom: 8rpx; }
+.amount-value { font-size: 56rpx; font-weight: bold; color: #E8952A; }
+
+.reject-reason {
+  margin-top: 20rpx; padding: 16rpx 24rpx;
+  background: #fff1f0; border-radius: 10rpx;
+  font-size: 25rpx; color: #ff4d4f;
+}
+
+/* 信息区块 */
+.info-section {
+  background: #fff;
+  padding: 24rpx;
+  margin-bottom: 12rpx;
+}
+.section-label { font-size: 28rpx; font-weight: bold; color: #333; display: block; margin-bottom: 18rpx; }
+.info-row {
+  display: flex; justify-content: space-between;
+  padding: 14rpx 0;
+  border-bottom: 1rpx solid #faf8f5;
+}
+.info-row:last-child { border-bottom: none; }
+.info-label { font-size: 26rpx; color: #999; flex-shrink: 0; margin-right: 24rpx; }
+.info-value { font-size: 26rpx; color: #333; text-align: right; word-break: break-all; }
+.desc-value { flex: 1; line-height: 1.5; }
+
+/* 凭证图片 */
+.proof-grid { display: flex; flex-wrap: wrap; gap: 12rpx; }
+.proof-item {
+  width: 156rpx; height: 156rpx;
+  border-radius: 12rpx;
+}
+
+/* 时间线 */
+.timeline { padding: 8rpx 0 0 12rpx; }
+.timeline-item {
+  display: flex;
+  padding-bottom: 28rpx;
+  position: relative;
+}
+.timeline-item:not(:last-child)::before {
+  content: '';
+  position: absolute; left: 13rpx; top: 24rpx; bottom: 0;
+  width: 2rpx; background: #f0ece4;
+}
+.timeline-item:not(:last-child).::before { background: #E8952A; }
+.timeline-dot {
+  width: 28rpx; height: 28rpx;
+  border-radius: 50%;
+  background: #f0ece4;
+  flex-shrink: 0;
+  margin-right: 16rpx;
+  margin-top: 4rpx;
+}
+.timeline-dot.done { background: linear-gradient(135deg, #E8952A, #F5C066); }
+.timeline-content { flex: 1; }
+.timeline-text { font-size: 26rpx; color: #333; display: block; margin-bottom: 4rpx; }
+.timeline-time { font-size: 22rpx; color: #ccc; }
+
+/* 操作区 */
+.action-area {
+  padding: 20rpx 24rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+.btn-primary {
+  width: 100%; height: 88rpx; line-height: 88rpx; text-align: center;
+  background: linear-gradient(135deg, #E8952A, #F5C066);
+  color: #fff; font-size: 30rpx; font-weight: 500;
+  border-radius: 44rpx; border: none;
+  box-shadow: 0 6rpx 20rpx rgba(232,149,42,0.3);
+}
+.btn-primary::after { border: none; }
+.btn-outline {
+  width: 100%; height: 88rpx; line-height: 88rpx; text-align: center;
+  background: #fff;
+  color: #E8952A; font-size: 30rpx;
+  border-radius: 44rpx; border: 2rpx solid #E8952A;
+}
+.btn-outline::after { border: none; }
+
+/* ========== 物流弹层 ========== */
+.mask {
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0); z-index: 200; opacity: 0;
+  pointer-events: none; transition: all 0.25s;
+}
+.mask.show { background: rgba(0,0,0,0.45); opacity: 1; pointer-events: auto; }
+.sheet {
+  position: fixed; left: 28rpx; right: 28rpx; top: 50%;
+  transform: translateY(-50%) scale(0.92);
+  background: #fff; border-radius: 24rpx;
+  padding: 36rpx 28rpx 28rpx;
+  z-index: 201; opacity: 0;
+  transition: all 0.25s cubic-bezier(0.33, 1, 0.68, 1);
+}
+.sheet.show { opacity: 1; transform: translateY(-50%) scale(1); }
+.sheet-title { font-size: 32rpx; font-weight: bold; text-align: center; display: block; margin-bottom: 30rpx; }
+.form-group { margin-bottom: 24rpx; }
+.form-label { font-size: 26rpx; color: #666; display: block; margin-bottom: 10rpx; }
+.form-input {
+  width: 100%; height: 80rpx;
+  background: #faf8f5; border-radius: 12rpx;
+  font-size: 28rpx; color: #333;
+  padding: 0 20rpx; box-sizing: border-box;
+}
+.btn-sheet-confirm {
+  width: 100%; height: 84rpx; line-height: 84rpx;
+  background: linear-gradient(135deg, #E8952A, #F5C066);
+  color: #fff; font-size: 30rpx;
+  border-radius: 42rpx; border: none;
+  margin-top: 10rpx;
+}
+.btn-sheet-confirm::after { border: none; }
+
+/* ========== 退货物流追踪 ========== */
+.tracking-highlight {
+  color: #E8952A; font-weight: 500;
+  letter-spacing: 1rpx;
+}
+
+.tracking-actions {
+  display: flex; gap: 20rpx; margin-top: 20rpx; padding-top: 20rpx;
+  border-top: 1rpx solid #faf8f5;
+}
+
+.tracking-btn {
+  flex: 1; height: 70rpx; line-height: 70rpx;
+  text-align: center; font-size: 26rpx;
+  border-radius: 35rpx;
+}
+
+.tracking-btn.secondary {
+  background: #faf8f5; color: #666;
+}
+
+.tracking-btn.primary {
+  background: linear-gradient(135deg, #E8952A, #F5C066);
+  color: #fff;
+}
+
+/* ========== 物流弹层补充 ========== */
+.sheet-desc {
+  font-size: 24rpx; color: #999; text-align: center;
+  display: block; margin-bottom: 24rpx; margin-top: -16rpx;
+}
+
+.form-input.preset {
+  color: #999;
+}

@@ -1,0 +1,63 @@
+<!-- 购物车 -->
+<view class="page">
+  <!-- 空购物车 -->
+  <view class="empty-cart" wx:if="{{cartList.length === 0}}">
+    <text class="empty-icon">🛒</text>
+    <text class="empty-text">购物车是空的</text>
+    <button class="btn-go" bindtap="goShop">去逛逛</button>
+  </view>
+
+  <!-- 商品列表 -->
+  <view class="cart-list" wx:else>
+    <!-- 全选 -->
+    <view class="select-all">
+      <label class="checkbox-wrap">
+        <checkbox checked="{{selectAll}}" bindchange="toggleSelectAll" />
+        <text>全选</text>
+      </label>
+      <text class="delete-btn" bindtap="deleteSelected">删除选中</text>
+    </view>
+
+    <!-- 购物车项 -->
+    <view class="cart-item" wx:for="{{cartList}}" wx:key="id">
+      <label class="checkbox-wrap">
+        <checkbox 
+          checked="{{item.selected}}" 
+          data-index="{{index}}"
+          bindchange="toggleItem"
+        />
+      </label>
+      
+      <image class="item-img" src="{{item.image}}" mode="aspectFill" bindtap="goDetail" data-id="{{item.id}}" />
+      
+      <view class="item-info">
+        <text class="item-title ellipsis-2" bindtap="goDetail" data-id="{{item.id}}">{{item.title}}</text>
+        <view class="item-bottom">
+          <text class="price">¥{{item.price}}</text>
+          <view class="quantity-control">
+            <text class="qty-btn" data-index="{{index}}" bindtap="decreaseQty">-</text>
+            <text class="qty-num">{{item.quantity}}</text>
+            <text class="qty-btn" data-index="{{index}}" bindtap="increaseQty">+</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 底部结算栏 -->
+  <view class="checkout-bar safe-area-bottom" wx:if="{{cartList.length > 0}}">
+    <label class="checkbox-wrap">
+      <checkbox checked="{{selectAll}}" bindchange="toggleSelectAll" />
+      <text>全选</text>
+    </label>
+    
+    <view class="price-info">
+      <text class="total-label">合计:</text>
+      <text class="total-price">¥{{totalPrice}}</text>
+    </view>
+    
+    <button class="btn-checkout {{selectedCount === 0 ? 'disabled' : ''}}" bindtap="goCheckout" disabled="{{selectedCount === 0}}">
+      结算({{selectedCount}})
+    </button>
+  </view>
+</view>

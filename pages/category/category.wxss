@@ -1,0 +1,139 @@
+/* 分类页样式 */
+.page {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.category-container {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.category-left {
+  width: 180rpx;
+  background: #f5f5f5;
+  height: 100%;
+}
+.category-item {
+  padding: 22rpx 12rpx;
+  font-size: 24rpx;
+  color: #333;
+  text-align: center;
+  border-bottom: 1rpx solid #eee;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8rpx;
+}
+.cat-icon-img {
+  width: 44rpx;
+  height: 44rpx;
+  border-radius: 8rpx;
+}
+.cat-icon-txt {
+  font-size: 32rpx;
+  line-height: 1;
+}
+.category-item.active {
+  background: #fff;
+  color: #E8952A;
+  font-weight: bold;
+  position: relative;
+}
+.category-item.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 6rpx;
+  height: 36rpx;
+  background: #E8952A;
+  border-radius: 3rpx;
+}
+
+.product-right {
+  flex: 1;
+  background: #fff;
+  height: 100%;
+}
+
+.filter-bar {
+  display: flex;
+  border-bottom: 1rpx solid #eee;
+}
+.filter-item {
+  flex: 1;
+  text-align: center;
+  padding: 24rpx;
+  font-size: 26rpx;
+  color: #666;
+}
+.filter-item.active {
+  color: #E8952A;
+  font-weight: bold;
+}
+
+.product-grid {
+  display: flex;
+  flex-wrap: wrap;
+  padding: 16rpx;
+}
+.product-grid .product-card {
+  width: calc(50% - 12rpx);
+  margin: 6rpx;
+  background: #fff;
+  border-radius: 12rpx;
+  overflow: hidden;
+  box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.06);
+  display: flex;
+  flex-direction: column;
+}
+.product-img {
+  width: 100%;
+  height: 260rpx;
+}
+.product-info {
+  padding: 16rpx;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.product-title {
+  font-size: 26rpx;
+  color: #333;
+  line-height: 1.4;
+  display: block;
+  margin-bottom: 8rpx;
+  /* 固定最大2行高度，确保底部对齐 */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  /* 固定最大2行高度，确保底部对齐 */
+}
+.product-price-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+.product-sales {
+  font-size: 22rpx;
+  color: #aaa;
+}
+.price {
+  font-size: 30rpx;
+  font-weight: bold;
+  color: #E8952A;
+}
+
+.empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 400rpx;
+  color: #999;
+}

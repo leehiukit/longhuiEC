@@ -1,0 +1,158 @@
+/* 优惠券样式 */
+.page {
+  min-height: 100vh;
+  background: #faf8f5;
+}
+
+.tab-bar {
+  display: flex;
+  background: #fff;
+  padding: 0 28rpx;
+  border-bottom: 1rpx solid #f0ece4;
+}
+
+.tab {
+  flex: 1;
+  text-align: center;
+  padding: 28rpx 0;
+  font-size: 27rpx;
+  color: #999;
+  position: relative;
+}
+
+.tab.active {
+  color: #E8952A;
+  font-weight: bold;
+}
+
+.tab.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 48rpx;
+  height: 4rpx;
+  background: #E8952A;
+  border-radius: 2rpx;
+}
+
+.coupon-list {
+  padding: 24rpx 28rpx;
+}
+
+.coupon-card {
+  display: flex;
+  background: #fff;
+  border-radius: 16rpx;
+  margin-bottom: 20rpx;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 2rpx 10rpx rgba(0,0,0,0.04);
+}
+
+.coupon-left {
+  width: 200rpx;
+  padding: 28rpx 24rpx;
+  background: linear-gradient(160deg, #E8952A, #F5C066);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.coupon-amount {
+  font-size: 28rpx;
+  color: #fff;
+  font-weight: bold;
+}
+
+.coupon-amount .num {
+  font-size: 56rpx;
+  line-height: 1;
+}
+
+.coupon-condition {
+  font-size: 22rpx;
+  color: rgba(255,255,255,0.8);
+  margin-top: 8rpx;
+}
+
+.coupon-right {
+  flex: 1;
+  padding: 24rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+}
+
+.coupon-title {
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.coupon-range {
+  font-size: 23rpx;
+  color: #999;
+}
+
+.coupon-date {
+  font-size: 21rpx;
+  color: #bbb;
+}
+
+.btn-use {
+  align-self: flex-end;
+  margin-top: 6rpx;
+  background: linear-gradient(135deg, #E8952A, #F5C066);
+  color: #fff;
+  font-size: 22rpx;
+  padding: 8rpx 24rpx;
+  border-radius: 20rpx;
+}
+
+/* 已使用 */
+.coupon-card.used {
+  opacity: 0.55;
+}
+
+.coupon-card.used .coupon-left,
+.coupon-card.expired .coupon-left {
+  background: #ccc;
+}
+
+.stamp-used, .stamp-expired {
+  position: absolute;
+  right: 20rpx;
+  bottom: 20rpx;
+  font-size: 22rpx;
+  color: #fff;
+  background: #aaa;
+  padding: 4rpx 14rpx;
+  border-radius: 8rpx;
+  transform: rotate(-12deg);
+}
+
+.stamp-expired {
+  background: #ddd;
+  color: #999;
+}
+
+/* 空状态 */
+.empty {
+  text-align: center;
+  padding-top: 150rpx;
+}
+
+.empty-icon {
+  display: block;
+  font-size: 100rpx;
+  margin-bottom: 20rpx;
+}
+
+.empty-text {
+  font-size: 28rpx;
+  color: #999;
+}

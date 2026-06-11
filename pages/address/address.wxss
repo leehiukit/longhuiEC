@@ -1,0 +1,158 @@
+/* 地址管理样式 */
+.address-list {
+  padding-bottom: 140rpx;
+}
+.address-card {
+  background: #fff;
+  margin-bottom: 2rpx;
+  padding: 28rpx 24rpx;
+}
+.card-main {
+  margin-bottom: 20rpx;
+}
+.name-row {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  margin-bottom: 14rpx;
+}
+.name {
+  font-size: 30rpx;
+  font-weight: bold;
+  color: #333;
+}
+.phone { font-size: 28rpx; color: #666; }
+.default-tag {
+  background: #E8952A;
+  color: #fff;
+  font-size: 20rpx;
+  padding: 4rpx 12rpx;
+  border-radius: 8rpx;
+}
+.detail {
+  font-size: 26rpx;
+  color: #888;
+  line-height: 1.5;
+}
+
+.card-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 32rpx;
+  padding-top: 16rpx;
+  border-top: 1rpx solid #f5f5f5;
+}
+.action-btn {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  font-size: 24rpx;
+  color: #666;
+}
+.action-btn.delete { color: #ff4d4f; }
+
+/* 空状态 */
+.empty-address {
+  text-align: center;
+  padding-top: 150rpx;
+}
+.empty-icon { font-size: 100rpx; display: block; margin-bottom: 20rpx; }
+.empty-text { font-size: 30rpx; color: #999; display: block; }
+.empty-tip { font-size: 25rpx; color: #bbb; margin-top: 10rpx; }
+
+/* 添加按钮 */
+.add-btn {
+  position: fixed;
+  left: 40rpx;
+  right: 40rpx;
+  bottom: 40rpx;
+  height: 88rpx;
+  background: linear-gradient(135deg, #E8952A, #F5C066);
+  color: #fff;
+  font-size: 32rpx;
+  border-radius: 44rpx;
+  border: none;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  line-height: 1;
+}
+.add-btn::after { display: none; }
+
+/* 弹窗 */
+.modal-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.modal-content {
+  width: 90%;
+  max-height: 80vh;
+  background: #fff;
+  border-radius: 20rpx;
+  overflow-y: auto;
+  padding: 30rpx;
+}
+.modal-header {
+  font-size: 34rpx;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 30rpx;
+}
+
+.form-group { margin-bottom: 24rpx; }
+.form-input {
+  height: 84rpx;
+  line-height: 84rpx;
+  border: 1rpx solid #ddd;
+  border-radius: 12rpx;
+  padding: 0 24rpx;
+  font-size: 28rpx;
+  color: #333;
+}
+.picker-value { color: #333; }
+.textarea-group .form-textarea {
+  height: 160rpx;
+  line-height: 44rpx;
+  border: 1rpx solid #ddd;
+  border-radius: 12rpx;
+  padding: 16rpx 24rpx;
+  font-size: 28rpx;
+  width: auto;
+}
+.default-check {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  font-size: 28rpx;
+  margin: 20rpx 0 30rpx;
+}
+
+.modal-footer {
+  display: flex;
+  gap: 20rpx;
+}
+.btn-cancel, .btn-save {
+  flex: 1;
+  height: 80rpx;
+  font-size: 30rpx;
+  border-radius: 12rpx;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  line-height: 1;
+}
+.btn-cancel { background: #f5f5f5; color: #666; }
+.btn-save { background: #E8952A; color: #fff; }
+.btn-cancel::after, .btn-save::after { display: none; }

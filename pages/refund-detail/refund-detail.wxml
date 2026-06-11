@@ -1,0 +1,138 @@
+<!-- 退款详情页 - 有闲甄选 -->
+<view class="page" wx:if="{{refund}}">
+
+  <!-- 状态卡片 -->
+  <view class="status-card" style="background: linear-gradient(135deg, {{statusInfo.color}}22, {{statusInfo.color}}08);">
+    <text class="status-icon">{{statusInfo.icon}}</text>
+    <text class="status-label" style="color: {{statusInfo.color}};">{{statusInfo.label}}</text>
+    <text class="status-desc">{{statusInfo.desc}}</text>
+
+    <!-- 退款金额 -->
+    <view class="refund-amount">
+      <text class="amount-label">退款金额</text>
+      <text class="amount-value">¥{{refund.amount ? refund.amount.toFixed(2) : (order ? order.finalPrice.toFixed(2) : '0.00')}}</text>
+    </view>
+
+    <!-- 拒绝理由 -->
+    <view class="reject-reason" wx:if="{{refund.status === 'rejected' && refund.rejectReason}}">
+      <text>拒绝原因：{{refund.rejectReason}}</text>
+    </view>
+  </view>
+
+  <!-- 退款信息 -->
+  <view class="info-section">
+    <view class="info-row">
+      <text class="info-label">退款编号</text>
+      <text class="info-value">{{refund.id}}</text>
+    </view>
+    <view class="info-row">
+      <text class="info-label">退款类型</text>
+      <text class="info-value">{{refund.type === 'refund' ? '仅退款' : '退货退款'}}</text>
+    </view>
+    <view class="info-row">
+      <text class="info-label">退款原因</text>
+      <text class="info-value">{{refund.reason}}</text>
+    </view>
+    <view class="info-row">
+      <text class="info-label">申请时间</text>
+      <text class="info-value">{{refund.createdAt}}</text>
+    </view>
+    <view class="info-row" wx:if="{{refund.description}}">
+      <text class="info-label">补充说明</text>
+      <text class="info-value desc-value">{{refund.description}}</text>
+    </view>
+  </view>
+
+  <!-- 上传凭证 -->
+  <view class="info-section" wx:if="{{refund.images.length > 0}}">
+    <text class="section-label">上传凭证</text>
+    <view class="proof-grid">
+      <image
+        wx:for="{{refund.images}}" wx:key="*this"
+        class="proof-item"
+        src="{{item}}"
+        mode="aspectFill"
+        data-src="{{item}}"
+        bindtap="previewProof"
+      />
+    </view>
+  </view>
+
+  <!-- 退货物流 -->
+  <view class="info-section" wx:if="{{refund.logistics}}">
+    <text class="section-label">退货物流</text>
+    <view class="info-row">
+      <text class="info-label">快递公司</text>
+      <text class="info-value">{{refund.logistics.company}}</text>
+    </view>
+    <view class="info-row">
+      <text class="info-label">快递单号</text>
+      <text class="info-value tracking-highlight">{{refund.logistics.number}}</text>
+    </view>
+    <!-- 物流追踪操作 -->
+    <view class="tracking-actions" wx:if="{{refund.logistics.number}}">
+      <view class="tracking-btn secondary" bindtap="copyReturnTracking">
+        📋 复制单号
+      </view>
+      <view class="tracking-btn primary" bindtap="openReturnTracking">
+        🔍 查看物流
+      </view>
+    </view>
+  </view>
+
+  <!-- 进度追踪 -->
+  <view class="info-section">
+    <text class="section-label">处理进度</text>
+    <view class="timeline">
+      <view class="timeline-item" wx:for="{{refund.timeline}}" wx:key="time">
+        <view class="timeline-dot {{item.done ? 'done' : ''}}"></view>
+        <view class="timeline-content">
+          <text class="timeline-text">{{item.text}}</text>
+          <text class="timeline-time">{{item.time}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 操作按钮 -->
+  <view class="action-area safe-area-bottom">
+    <!-- 退货退款 & 已通过 -> 填写物流 -->
+    <button
+      wx:if="{{refund.type === 'return' && refund.status === 'approved'}}"
+      class="btn-primary"
+      bindtap="openLogistics"
+    >填写退货物流</button>
+
+    <!-- 联系客服 -->
+    <button class="btn-outline" bindtap="contactService">联系客服</button>
+  </view>
+
+  <!-- ============ 物流填写弹层 ============ -->
+  <view class="mask {{showLogistics ? 'show' : ''}}" catchtouchmove="{{true}}" bindtap="closeLogistics">
+    <view class="sheet {{showLogistics ? 'show' : ''}}" catchtap="">
+      <text class="sheet-title">填写退货物流</text>
+      <view class="sheet-desc">我们仅支持顺丰速运，寄回后请填写运单号</view>
+      <view class="form-group">
+        <text class="form-label">快递公司</text>
+        <input
+          class="form-input preset"
+          placeholder="顺丰速运"
+          value="{{logisticsCompany}}"
+          bindinput="onCompanyInput"
+        />
+      </view>
+      <view class="form-group">
+        <text class="form-label">快递单号</text>
+        <input
+          class="form-input"
+          placeholder="请输入顺丰运单号"
+          value="{{logisticsNumber}}"
+          bindinput="onNumberInput"
+          type="text"
+        />
+      </view>
+      <button class="btn-sheet-confirm" bindtap="submitLogistics">确认提交</button>
+    </view>
+  </view>
+
+</view>

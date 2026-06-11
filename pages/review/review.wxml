@@ -1,0 +1,95 @@
+<!-- 评价页面 -->
+<view class="container">
+  <!-- 商品信息 -->
+  <view class="order-info" wx:if="{{order}}">
+    <view class="order-items">
+      <view class="order-item" wx:for="{{order.items}}" wx:key="id">
+        <image class="item-image" src="{{item.image}}" mode="aspectFill" />
+        <view class="item-info">
+          <text class="item-title">{{item.title}}</text>
+          <text class="item-spec" wx:if="{{item.spec}}">{{item.spec}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 评分 -->
+  <view class="section rating-section">
+    <text class="section-title">商品评分</text>
+    <view class="stars">
+      <view 
+        class="star {{index < rating ? 'active' : ''}}" 
+        wx:for="{{[1,2,3,4,5]}}" 
+        wx:key="*this"
+        data-rating="{{item}}"
+        bindtap="setRating"
+      >
+        <text>{{index < rating ? '★' : '☆'}}</text>
+      </view>
+    </view>
+    <text class="rating-text">
+      {{rating === 1 ? '很差' : rating === 2 ? '较差' : rating === 3 ? '一般' : rating === 4 ? '满意' : '非常满意'}}
+    </text>
+  </view>
+
+  <!-- 标签 -->
+  <view class="section tags-section">
+    <text class="section-title">评价标签</text>
+    <view class="tags">
+      <view 
+        class="tag {{selectedTags.indexOf(item) > -1 ? 'active' : ''}}"
+        wx:for="{{tags}}"
+        wx:key="*this"
+        data-tag="{{item}}"
+        bindtap="toggleTag"
+      >
+        {{item}}
+      </view>
+    </view>
+  </view>
+
+  <!-- 评价内容 -->
+  <view class="section content-section">
+    <text class="section-title">评价内容</text>
+    <textarea 
+      class="content-input"
+      placeholder="分享您的使用体验，帮助更多买家..."
+      value="{{content}}"
+      bindinput="onContentInput"
+      maxlength="500"
+    />
+    <text class="content-count">{{content.length}}/500</text>
+  </view>
+
+  <!-- 上传图片 -->
+  <view class="section images-section">
+    <text class="section-title">晒图（选填）</text>
+    <view class="images-grid">
+      <view class="image-item" wx:for="{{images}}" wx:key="*this">
+        <image class="preview-image" src="{{item}}" mode="aspectFill" bindtap="previewImage" data-src="{{item}}" />
+        <view class="delete-btn" data-index="{{index}}" catchtap="deleteImage">×</view>
+      </view>
+      <view class="add-image" wx:if="{{images.length < 6}}" bindtap="chooseImage">
+        <text class="add-icon">+</text>
+        <text class="add-text">添加图片</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 匿名评价 -->
+  <view class="section anonymous-section">
+    <view class="anonymous-row" bindtap="toggleAnonymous">
+      <text class="anonymous-text">匿名评价</text>
+      <view class="checkbox {{anonymous ? 'checked' : ''}}">
+        <text wx:if="{{anonymous}}">✓</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 提交按钮 -->
+  <view class="submit-section">
+    <button class="submit-btn" bindtap="submitReview" disabled="{{submitting}}">
+      {{submitting ? '提交中...' : '发表评价'}}
+    </button>
+  </view>
+</view>

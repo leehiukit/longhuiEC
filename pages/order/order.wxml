@@ -1,0 +1,132 @@
+<!-- 确认订单 -->
+<view class="page">
+  <!-- 收货地址 -->
+  <view class="address-section" bindtap="selectAddress">
+    <block wx:if="{{address}}">
+      <view class="address-info">
+        <view class="address-top">
+          <text class="name">{{address.name}}</text>
+          <text class="phone">{{address.phone}}</text>
+        </view>
+        <text class="address-detail ellipsis-2">{{address.province}}{{address.city}}{{address.district}}{{address.detail}}</text>
+      </view>
+      <text class="arrow">›</text>
+    </block>
+    <view class="no-address" wx:else>
+      <text>📍</text>
+      <text>请选择收货地址</text>
+      <text class="arrow">›</text>
+    </view>
+  </view>
+
+  <!-- 商品列表 -->
+  <view class="goods-section">
+    <view class="section-title">商品信息</view>
+    <view 
+      class="goods-item" 
+      wx:for="{{orderItems}}" 
+      wx:key="id"
+    >
+      <image class="goods-img" src="{{item.image}}" mode="aspectFill" />
+      <view class="goods-info">
+        <text class="goods-title ellipsis-2">{{item.title}}</text>
+        <view class="goods-bottom">
+          <text class="price">¥{{item.price}}</text>
+          <text class="quantity">x{{item.quantity}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 优惠券 -->
+  <view class="coupon-section" bindtap="selectCoupon">
+    <text>优惠券</text>
+    <view class="coupon-right">
+      <text class="coupon-value" wx:if="{{coupon}}">-¥{{coupon.amount}}</text>
+      <text class="no-coupon" wx:else>{{coupons.length > 0 ? coupons.length + '张可用' : '暂无可用'}}</text>
+      <view class="coupon-clear" wx:if="{{coupon}}" catchtap="clearCoupon">✕</view>
+      <text class="arrow">›</text>
+    </view>
+  </view>
+
+  <!-- 订单备注 -->
+  <view class="remark-section">
+    <text>订单备注</text>
+    <input 
+      class="remark-input" 
+      placeholder="选填，可填写特殊要求"
+      value="{{remark}}"
+      bindinput="onRemarkInput"
+    />
+  </view>
+
+  <!-- 费用明细 -->
+  <view class="price-section">
+    <view class="price-row">
+      <text>商品金额</text>
+      <text>¥{{totalAmount}}</text>
+    </view>
+    <view class="price-row">
+      <text>运费</text>
+      <text>¥{{freight}}</text>
+    </view>
+    <view class="price-row discount" wx:if="{{coupon}}">
+      <text>优惠减免</text>
+      <text>-¥{{coupon.amount}}</text>
+    </view>
+  </view>
+
+  <!-- 底部提交栏 -->
+  <view class="submit-bar safe-area-bottom">
+    <view class="price-info">
+      <text>实付款:</text>
+      <text class="final-price">¥{{finalPrice}}</text>
+    </view>
+    <button class="btn-submit" bindtap="submitOrder" loading="{{submitting}}">
+      提交订单
+    </button>
+  </view>
+
+  <!-- ==================== 支付弹层 ==================== -->
+  <view class="payment-mask {{showPayment ? 'show' : ''}}" catchtouchmove="{{true}}" bindtap="closePayment">
+    <view class="payment-sheet {{showPayment ? 'show' : ''}}" catchtap="">
+      <!-- 头部 -->
+      <view class="pay-header">
+        <text class="pay-title">确认支付</text>
+        <text class="pay-amount">¥{{finalPrice}}</text>
+        <text class="pay-close" bindtap="closePayment">✕</text>
+      </view>
+
+      <!-- 支付方式 -->
+      <view class="pay-methods">
+        <view class="pay-label">选择支付方式</view>
+        
+        <view 
+          class="pay-method active"
+          data-method="wechat"
+          bindtap="selectPayMethod"
+        >
+          <view class="pay-method-icon wechat-icon">💚</view>
+          <text class="pay-method-name">微信支付</text>
+          <view class="pay-radio checked"></view>
+        </view>
+      </view>
+
+      <!-- 底部确认按钮 -->
+      <view class="pay-footer">
+        <view class="pay-tip" wx:if="{{!paying}}">请在 30 分钟内完成支付</view>
+        <view class="pay-tip paying" wx:else>
+          <text class="paying-dot"></text>支付验证中...
+        </view>
+        <button 
+          class="btn-pay-confirm" 
+          bindtap="confirmPayment" 
+          loading="{{paying}}"
+          disabled="{{paying}}"
+        >
+          立即支付 ¥{{finalPrice}}
+        </button>
+      </view>
+    </view>
+  </view>
+</view>

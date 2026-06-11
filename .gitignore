@@ -1,0 +1,5 @@
+.DS_Store
+.codebuddy/
+node_modules/
+*.log
+project.private.config.json

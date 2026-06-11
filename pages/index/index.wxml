@@ -1,0 +1,118 @@
+<!-- 首页 - 有闲甄选 -->
+<view class="page">
+  <!-- 搜索栏 -->
+  <view class="search-bar" bindtap="goSearch">
+    <view class="search-input">
+      <text class="search-icon">🔍</text>
+      <text class="search-placeholder">搜索甄选好物...</text>
+    </view>
+  </view>
+
+  <!-- 品牌Logo区 -->
+  <view class="brand-banner">
+    <image
+      wx:if="{{logoPath}}"
+      class="brand-logo"
+      src="{{logoPath}}"
+      mode="aspectFit"
+    />
+    <view wx:else class="brand-text-logo">
+      <text class="brand-name">有闲甄选</text>
+      <text class="brand-en">Selection in Idle</text>
+    </view>
+    <text class="brand-slogan">品质好物 · 甄心严选</text>
+    <view class="brand-stats">
+      <view class="stat-item">
+        <text class="stat-num">20000+</text>
+        <text class="stat-label">全平台累计销量</text>
+      </view>
+      <view class="stat-divider"></view>
+      <view class="stat-item">
+        <text class="stat-num">{{productCount || '200+'}}</text>
+        <text class="stat-label">甄选商品</text>
+      </view>
+      <view class="stat-divider"></view>
+      <view class="stat-item">
+        <text class="stat-num">99%</text>
+        <text class="stat-label">全平台好评率</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 轮播图 -->
+  <swiper class="banner" indicator-dots indicator-color="rgba(255,255,255,0.5)" indicator-active-color="#fff" autoplay circular>
+    <swiper-item wx:for="{{banners}}" wx:key="id" bindtap="goBanner" data-item="{{item}}">
+      <block wx:if="{{item.imageUrl}}">
+        <image class="banner-img" src="{{item.imageUrl}}" mode="aspectFill" />
+      </block>
+      <block wx:else>
+        <view class="banner-card" style="background:{{item.color}}">
+          <text class="banner-card-title">{{item.title}}</text>
+          <text class="banner-card-desc">{{item.desc}}</text>
+        </view>
+      </block>
+    </swiper-item>
+  </swiper>
+
+  <!-- 分类入口 -->
+  <view class="category-grid">
+    <view
+      class="category-item"
+      wx:for="{{categories}}"
+      wx:key="id"
+      data-id="{{item.id}}"
+      bindtap="goCategory"
+    >
+      <view wx:if="{{item.iconImage}}" class="category-icon-wrap">
+        <image class="category-icon-img" src="{{item.iconImage}}" mode="aspectFit" />
+      </view>
+      <view wx:else class="category-icon">{{item.icon}}</view>
+      <text class="category-name">{{item.name}}</text>
+    </view>
+  </view>
+
+  <!-- 甄选推荐标题 -->
+  <view class="section-header">
+    <view class="title-left">
+      <text class="section-title">甄选推荐</text>
+      <text class="section-sub">严选品质 · 放心入手</text>
+    </view>
+    <text class="section-more" bindtap="goMore">更多 ›</text>
+  </view>
+
+  <!-- 商品列表 -->
+  <view class="product-list">
+    <view
+      class="product-card"
+      wx:for="{{products}}"
+      wx:key="id"
+      bindtap="goDetail"
+      data-id="{{item.id}}"
+    >
+      <view class="product-img-wrap">
+        <image class="product-img" src="{{item.image}}" mode="aspectFill" />
+        <view class="product-tag" wx:if="{{item.condition}}">{{item.condition}}</view>
+        <view class="product-badge" wx:if="{{item.isHot}}">热卖</view>
+      </view>
+      <view class="product-info">
+        <text class="product-title ellipsis-2">{{item.title}}</text>
+        <text class="product-specs ellipsis">{{item.specsText}}</text>
+        <view class="product-bottom">
+          <view class="product-price">
+            <text class="price">¥{{item.price}}</text>
+            <text class="price-original">¥{{item.originalPrice}}</text>
+          </view>
+          <view class="save-info">
+            <text>省¥{{item.originalPrice - item.price}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 加载更多 -->
+  <view class="load-more" wx:if="{{products.length > 0}}">
+    <view class="load-line"></view>
+    <text>{{loading ? '加载中...' : '— 已经到底啦 —'}}</text>
+  </view>
+</view>

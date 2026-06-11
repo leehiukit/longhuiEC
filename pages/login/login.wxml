@@ -1,0 +1,90 @@
+<!-- 登录页 - 有闲甄选 -->
+<view class="page">
+  <!-- 品牌头部 -->
+  <view class="header">
+    <!-- Logo图片 -->
+    <image 
+      wx:if="{{logoPath}}" 
+      class="logo-img" 
+      src="{{logoPath}}" 
+      mode="aspectFit" 
+    />
+    <!-- 文字Logo备用 -->
+    <view wx:else class="logo-text-wrap">
+      <text class="logo-text">有闲甄选</text>
+    </view>
+    <text class="brand-slogan">Selection in Idle</text>
+    <text class="welcome-text">欢迎回来</text>
+  </view>
+
+  <!-- 登录表单 -->
+  <view class="login-form">
+    <!-- 手机号+验证码登录 -->
+    <view class="form-item">
+      <text class="form-icon">📱</text>
+      <input
+        class="form-input"
+        type="number"
+        placeholder="请输入手机号"
+        maxlength="11"
+        value="{{phone}}"
+        bindinput="onPhoneInput"
+      />
+    </view>
+
+    <view class="form-item code-row">
+      <text class="form-icon">🔑</text>
+      <input
+        class="form-input code-input"
+        placeholder="验证码"
+        maxlength="6"
+        value="{{code}}"
+        bindinput="onCodeInput"
+      />
+      <button
+        class="code-btn {{countdown > 0 ? 'disabled' : ''}}"
+        bindtap="sendCode"
+        disabled="{{countdown > 0 || !phone}}"
+      >
+        {{countdown > 0 ? countdown + 's 后重发' : '获取验证码'}}
+      </button>
+    </view>
+
+    <button
+      class="btn-login"
+      bindtap="doLogin"
+      loading="{{loading}}"
+      disabled="{{!phone || !code || !agreed}}"
+    >
+      登 录
+    </button>
+
+    <view class="login-tips">首次登录将自动注册账号</view>
+  </view>
+
+  <!-- 微信快捷登录 -->
+  <view class="wechat-login">
+    <view class="divider"><text>其他方式</text></view>
+    <button
+      class="btn-wechat {{wechatLogging ? 'disabled' : ''}}"
+      open-type="getPhoneNumber"
+      bindgetphonenumber="onGetPhone"
+      disabled="{{wechatLogging}}"
+      loading="{{wechatLogging}}"
+    >
+      <text class="wx-icon">📲</text>
+      <text>{{wechatLogging ? '登录中...' : '微信一键登录'}}</text>
+    </button>
+  </view>
+
+  <!-- 协议 -->
+  <view class="agreement">
+    <label class="agree-check">
+      <checkbox checked="{{agreed}}" bindchange="onAgreeChange" color="#E8952A" />
+      <text>登录即表示同意</text>
+      <text class="link" bindtap="viewAgreement">《有闲甄选服务协议》</text>
+      <text>和</text>
+      <text class="link" bindtap="viewPrivacy">《隐私政策》</text>
+    </label>
+  </view>
+</view>

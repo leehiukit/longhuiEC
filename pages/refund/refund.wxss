@@ -1,0 +1,148 @@
+/* ========== 退款申请页 ========== */
+.page {
+  min-height: 100vh;
+  background: #faf8f5;
+  padding-bottom: 160rpx;
+}
+
+/* 订单摘要 */
+.order-brief {
+  display: flex;
+  align-items: center;
+  background: #fff;
+  padding: 24rpx;
+  margin-bottom: 12rpx;
+}
+.brief-img {
+  width: 120rpx; height: 120rpx;
+  border-radius: 12rpx;
+  margin-right: 20rpx;
+  flex-shrink: 0;
+}
+.brief-info { flex: 1; }
+.brief-title { font-size: 27rpx; color: #333; margin-bottom: 10rpx; }
+.brief-price { font-size: 30rpx; font-weight: bold; color: #E8952A; }
+
+/* 区块 */
+.section {
+  background: #fff;
+  padding: 28rpx 24rpx;
+  margin-bottom: 12rpx;
+}
+.section-title { font-size: 28rpx; font-weight: bold; color: #333; margin-bottom: 20rpx; }
+.required { color: #ff4d4f; }
+
+/* 超期提示 */
+.expired-notice {
+  display: flex;
+  align-items: center;
+  background: #fff7e6;
+  border: 1rpx solid #ffd591;
+  border-radius: 12rpx;
+  padding: 20rpx 24rpx;
+}
+.expired-icon { font-size: 36rpx; margin-right: 14rpx; flex-shrink: 0; }
+.expired-text { font-size: 25rpx; color: #ad6800; flex: 1; line-height: 1.5; }
+
+/* 退款类型 */
+.type-row { display: flex; gap: 16rpx; }
+.type-item {
+  flex: 1;
+  padding: 28rpx 20rpx;
+  border: 2rpx solid #f0ece4;
+  border-radius: 16rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  transition: border-color 0.2s;
+}
+.type-item.active { border-color: #E8952A; }
+.type-icon { font-size: 48rpx; margin-bottom: 10rpx; }
+.type-name { font-size: 28rpx; font-weight: 500; color: #333; margin-bottom: 6rpx; }
+.type-desc { font-size: 22rpx; color: #bbb; }
+.type-check {
+  position: absolute; top: 16rpx; right: 16rpx;
+  width: 36rpx; height: 36rpx;
+  border: 2rpx solid #ddd; border-radius: 50%;
+  transition: all 0.2s;
+}
+.type-check.on { border-color: #E8952A; background: #E8952A; border-width: 5rpx; box-shadow: inset 0 0 0 3rpx #fff; }
+
+/* 原因 */
+.reason-grid { display: flex; flex-wrap: wrap; gap: 14rpx; }
+.reason-tag {
+  padding: 14rpx 24rpx;
+  background: #faf8f5;
+  border: 1rpx solid #f0ece4;
+  border-radius: 8rpx;
+  font-size: 25rpx;
+  color: #666;
+  transition: all 0.2s;
+}
+.reason-tag.active { background: #fef6ec; border-color: #E8952A; color: #E8952A; }
+
+/* 金额 */
+.amount-row {
+  display: flex; align-items: center;
+  border-bottom: 2rpx solid #f0ece4;
+  padding-bottom: 16rpx;
+}
+.amount-symbol { font-size: 40rpx; color: #E8952A; margin-right: 8rpx; }
+.amount-input { flex: 1; font-size: 40rpx; color: #E8952A; font-weight: bold; }
+.amount-max { font-size: 22rpx; color: #bbb; flex-shrink: 0; }
+
+/* 描述 */
+.desc-input {
+  width: 100%; height: 160rpx;
+  font-size: 26rpx; color: #333;
+  background: #faf8f5;
+  border-radius: 12rpx;
+  padding: 18rpx;
+  box-sizing: border-box;
+}
+.desc-count { text-align: right; font-size: 22rpx; color: #ccc; margin-top: 8rpx; }
+
+/* 图片 */
+.image-grid { display: flex; flex-wrap: wrap; gap: 14rpx; }
+.image-cell {
+  width: 156rpx; height: 156rpx;
+  border-radius: 12rpx;
+  position: relative;
+  overflow: hidden;
+}
+.proof-img { width: 100%; height: 100%; }
+.delete-btn {
+  position: absolute; top: 0; right: 0;
+  width: 40rpx; height: 40rpx;
+  background: rgba(0,0,0,0.5);
+  border-radius: 0 12rpx 0 12rpx;
+  color: #fff; font-size: 22rpx;
+  display: flex; align-items: center; justify-content: center;
+}
+.add-btn {
+  background: #faf8f5;
+  border: 2rpx dashed #ddd;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+}
+.add-icon { font-size: 56rpx; color: #ccc; line-height: 1; }
+.add-text { font-size: 20rpx; color: #ccc; margin-top: 4rpx; }
+
+/* 协议 */
+.agreement {
+  text-align: center; padding: 24rpx;
+  font-size: 23rpx; color: #bbb;
+}
+.agreement .link { color: #E8952A; }
+
+/* 提交 */
+.submit-area { padding: 20rpx 24rpx; }
+.btn-submit {
+  width: 100%; height: 88rpx; line-height: 88rpx;
+  background: linear-gradient(135deg, #E8952A, #F5C066);
+  color: #fff; font-size: 32rpx; font-weight: 500;
+  border-radius: 44rpx; border: none;
+  box-shadow: 0 8rpx 28rpx rgba(232,149,42,0.35);
+}
+.btn-submit::after { border: none; }

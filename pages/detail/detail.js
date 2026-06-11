@@ -1,0 +1,114 @@
+// 详情页逻辑 - 有闲甄选
+const app = getApp()
+const api = require('../../utils/api')
+
+Page({
+  data: {
+    productId: null,
+    product: null,
+    specList: [],
+    guarantees: [
+      { icon: '✓', text: '30天质保' },
+      { icon: '✓', text: '正品承诺' },
+      { icon: '✓', text: '极速发货' },
+      { icon: '✓', text: '七天无理由' }
+    ],
+    isFav: false,
+    cartCount: 0
+  },
+
+  onLoad(options) {
+    const id = options.id
+    this.setData({ productId: id })
+    this.loadDetail(id)
+    this.updateCartCount()
+  },
+
+  async loadDetail(id) {
+    try {
+      const res = await api.getProductDetail(id)
+      const product = res.data
+
+      let specList = []
+      if (product.specs && typeof product.specs === 'object' && !Array.isArray(product.specs)) {
+        const specMap = {
+          cpu: '处理器', memory: '内存', storage: '硬盘',
+          screen: '屏幕', graphics: '显卡',
+          battery: '电池', weight: '重量', os: '系统'
+        }
+        specList = Object.entries(product.specs).map(([key, value]) => ({
+          label: specMap[key] || key, value
+        }))
+      }
+
+      this.setData({ product, specList })
+
+      // 收藏状态
+      const favorites = wx.getStorageSync('yxzx_favorites') || []
+      this.setData({ isFav: favorites.some(f => f.id === id) })
+
+      wx.setNavigationBarTitle({
+        title: product.title ? (product.title.length > 10 ? product.title.substr(0, 10) + '...' : product.title) : '商品详情'
+      })
+    } catch (e) {
+      // console.error('加载失败:', e)
+    }
+  },
+
+  updateCartCount() {
+    const cart = app.globalData.cart || []
+    this.setData({ cartCount: cart.reduce((sum, item) => sum + (item.quantity || 1), 0) })
+  },
+
+  toggleFavorite() {
+    const { isFav, product, productId } = this.data
+    let favorites = wx.getStorageSync('yxzx_favorites') || []
+    
+    if (isFav) {
+      favorites = favorites.filter(f => f.id !== productId)
+      wx.showToast({ title: '已取消收藏', icon: 'none' })
+    } else {
+      favorites.push({
+        id: product.id,
+        title: product.title,
+        price: product.price,
+        image: product.image || (product.images && product.images[0]) || ''
+      })
+      wx.showToast({ title: '加入收藏夹', icon: 'success' })
+    }
+    wx.setStorageSync('yxzx_favorites', favorites)
+    this.setData({ isFav: !isFav })
+  },
+
+  addToCart() {
+    const { product } = this.data
+    if (!product) return
+    
+    let cart = app.globalData.cart || []
+    const existIdx = cart.findIndex(item => item.id === product.id)
+    
+    if (existIdx > -1) cart[existIdx].quantity++
+    else cart.push({
+      id: product.id, title: product.title, price: product.price,
+      image: product.images?.[0] || '', quantity: 1, selected: true
+    })
+
+    app.globalData.cart = cart
+    wx.setStorageSync('yxzx_cart', cart)
+    app.updateCartBadge(cart.length)
+    this.updateCartCount()
+    wx.showToast({ title: '已加入购物车', icon: 'success' })
+  },
+
+  buyNow() {
+    this.addToCart()
+    setTimeout(() => wx.switchTab({ url: '/pages/cart/cart' }), 500)
+  },
+
+  goHome() {
+    wx.switchTab({ url: '/pages/index/index' })
+  },
+  goCart() {
+    wx.switchTab({ url: '/pages/cart/cart' })
+  },
+})

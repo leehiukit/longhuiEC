@@ -1,0 +1,203 @@
+/* ========== 订单详情 - 有闲甄选 ========== */
+.page {
+  min-height: 100%;
+  background: #faf8f5;
+  padding-bottom: 40rpx;
+}
+
+/* 状态头部 */
+.status-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 48rpx 0 36rpx;
+  margin: 0 22rpx 18rpx;
+  border-radius: 20rpx;
+}
+.status-icon { font-size: 64rpx; margin-bottom: 12rpx; }
+.status-label { font-size: 34rpx; font-weight: 600; }
+.status-remaining { font-size: 24rpx; color: #fa8c16; margin-top: 10rpx; }
+
+/* 进度条 */
+.progress-section {
+  background: #fff;
+  margin: 0 22rpx 18rpx;
+  border-radius: 20rpx;
+  padding: 36rpx 32rpx 24rpx;
+}
+.progress-bar { padding-bottom: 10rpx; }
+.progress-track {
+  position: relative;
+  width: 100%;
+  height: 6rpx;
+  background: #e8e5de;
+  border-radius: 3rpx;
+  margin: 0 auto;
+}
+.progress-fill {
+  position: absolute; top: 0; left: 0;
+  height: 100%;
+  background: linear-gradient(90deg, #E8952A, #F5C066);
+  border-radius: 3rpx;
+  transition: width 0.5s ease;
+}
+.progress-dot {
+  position: absolute; top: 50%;
+  transform: translate(-50%, -50%);
+  width: 52rpx; height: 52rpx;
+  background: #fff;
+  border: 3rpx solid #e8e5de;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 26rpx;
+  z-index: 1;
+}
+.progress-dot.done { border-color: #E8952A; background: #E8952A; }
+.progress-dot.current { border-color: #E8952A; background: #fff; box-shadow: 0 0 0 6rpx rgba(232,149,42,0.15); }
+.progress-labels {
+  display: flex; justify-content: space-between;
+  margin-top: 18rpx;
+}
+.progress-label {
+  font-size: 22rpx; color: #ccc; text-align: center; flex: 1;
+}
+.progress-label.done { color: #E8952A; }
+.progress-label.current { color: #E8952A; font-weight: 600; }
+
+/* 通用区块 */
+.section {
+  background: #fff;
+  margin: 0 22rpx 18rpx;
+  border-radius: 20rpx;
+  padding: 28rpx 28rpx;
+}
+.section-title {
+  display: flex; align-items: center; gap: 10rpx;
+  font-size: 28rpx; font-weight: 600; color: #333;
+  margin-bottom: 20rpx;
+  padding-bottom: 18rpx;
+  border-bottom: 1rpx solid #f8f4ee;
+}
+
+/* 收货地址 */
+.address-section { background: #fff; }
+.address-content {
+  display: flex; flex-direction: column; gap: 8rpx;
+}
+.address-person { font-size: 28rpx; color: #333; font-weight: 500; }
+.address-detail { font-size: 25rpx; color: #888; line-height: 1.5; }
+
+/* 商品 */
+.detail-product {
+  display: flex; align-items: center;
+  padding: 16rpx 0;
+  border-bottom: 1rpx solid #fcfaf7;
+}
+.detail-product:last-child { border-bottom: none; }
+.product-img {
+  width: 140rpx; height: 140rpx;
+  border-radius: 12rpx; flex-shrink: 0; margin-right: 18rpx;
+}
+.product-info {
+  flex: 1; display: flex; flex-direction: column; gap: 16rpx;
+}
+.product-title { font-size: 26rpx; color: #333; line-height: 1.5; }
+.product-bottom {
+  display: flex; justify-content: space-between; align-items: center;
+}
+.product-price { font-size: 28rpx; color: #333; font-weight: 500; }
+.product-qty { font-size: 24rpx; color: #bbb; }
+
+/* 价格明细 */
+.price-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 10rpx 0;
+}
+.price-label { font-size: 25rpx; color: #888; }
+.price-value { font-size: 25rpx; color: #333; }
+.price-value.free { color: #52c41a; }
+.price-value.discount { color: #52c41a; }
+.price-row.total {
+  border-top: 1rpx solid #f8f4ee; margin-top: 10rpx; padding-top: 16rpx;
+}
+.price-value.final { font-size: 36rpx; color: #E8952A; font-weight: bold; }
+
+/* 订单信息 */
+.info-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 12rpx 0;
+}
+.info-label { font-size: 24rpx; color: #888; }
+.info-value { font-size: 24rpx; color: #555; }
+
+/* 物流追踪 */
+.logistics-section .section-title {
+  justify-content: flex-start;
+}
+.carrier-tag {
+  font-size: 22rpx; color: #fff;
+  background: #e60012; padding: 4rpx 16rpx;
+  border-radius: 6rpx; margin-left: 16rpx;
+}
+.tracking-card {
+  border: 1rpx solid #f0ebe0;
+  border-radius: 16rpx; overflow: hidden;
+}
+.tracking-header {
+  display: flex; align-items: center; gap: 18rpx;
+  padding: 24rpx; background: #fefbf6;
+}
+.sf-logo {
+  width: 80rpx; height: 80rpx; border-radius: 12rpx; flex-shrink: 0;
+  background: #e60012; color: #fff;
+  font-size: 30rpx; font-weight: bold;
+  display: flex; align-items: center; justify-content: center;
+}
+.tracking-info { display: flex; flex-direction: column; gap: 8rpx; }
+.tracking-carrier { font-size: 28rpx; color: #333; font-weight: 500; }
+.tracking-no { font-size: 24rpx; color: #888; }
+.tracking-actions {
+  display: flex; gap: 16rpx; padding: 20rpx 24rpx;
+  border-top: 1rpx solid #f8f4ee;
+}
+.tracking-btn {
+  flex: 1; text-align: center; padding: 16rpx 0;
+  font-size: 26rpx; border-radius: 40rpx;
+}
+.tracking-btn.secondary {
+  border: 1rpx solid #e0dcd4; color: #888; background: #fff;
+}
+.tracking-btn.primary {
+  background: linear-gradient(135deg, #E8952A, #F5C066);
+  color: #fff;
+}
+
+/* 操作按钮 */
+.actions-section {
+  display: flex; justify-content: flex-end; gap: 18rpx;
+  margin: 32rpx 22rpx 0; flex-wrap: wrap;
+}
+.action-btn {
+  padding: 18rpx 40rpx; font-size: 26rpx;
+  border-radius: 40rpx; border: none; line-height: 1.4;
+}
+.action-btn::after { border: none; }
+.action-btn.primary {
+  background: linear-gradient(135deg, #E8952A, #F5C066); color: #fff;
+}
+.action-btn.cancel {
+  border: 1rpx solid #e0dcd4; color: #999; background: #fff;
+}
+.action-btn.outline {
+  border: 1rpx solid #E8952A; color: #E8952A; background: #fff;
+}
+
+/* 底部安全区 */
+.bottom-safe { height: 60rpx; }
+
+/* 公共 */
+.ellipsis-2 {
+  overflow: hidden; text-overflow: ellipsis;
+  display: -webkit-box; -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical; word-break: break-all;
+}

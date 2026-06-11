@@ -1,0 +1,39 @@
+{
+  "compileType": "miniprogram",
+  "libVersion": "3.6.0",
+  "packOptions": {
+    "ignore": [
+      {
+        "type": "file",
+        "value": "*.md"
+      },
+      {
+        "type": "file",
+        "value": "README.md"
+      }
+    ],
+    "include": []
+  },
+  "setting": {
+    "coverView": true,
+    "es6": true,
+    "postcss": true,
+    "minified": true,
+    "enhance": true,
+    "showShadowRootInWxmlPanel": true,
+    "packNpmRelationList": [],
+    "babelSetting": {
+      "ignore": [],
+      "disablePlugins": [],
+      "outputPath": ""
+    }
+  },
+  "condition": {},
+  "editorSetting": {
+    "tabIndent": "auto",
+    "tabSize": 2
+  },
+  "appid": "wx8cf5c2ef49e867fe",
+  "projectname": "有闲甄选",
+  "description": "有闲甄选 - 品质数码好物精选平台"
+}

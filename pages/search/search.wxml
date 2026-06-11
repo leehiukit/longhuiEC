@@ -1,0 +1,79 @@
+<!-- 搜索页 -->
+<view class="page">
+  <!-- 搜索框 -->
+  <view class="search-header">
+    <view class="search-box">
+      <text class="search-icon">🔍</text>
+      <input 
+        class="search-input" 
+        placeholder="搜索二手笔记本..."
+        value="{{keyword}}"
+        focus="{{true}}"
+        bindinput="onInput"
+        bindconfirm="doSearch"
+        confirm-type="search"
+      />
+    </view>
+    <text class="cancel-btn" bindtap="goBack">取消</text>
+  </view>
+
+  <!-- 搜索历史 -->
+  <view class="history-section" wx:if="{{!keyword && historyList.length > 0}}">
+    <view class="section-header">
+      <text>搜索历史</text>
+      <text class="clear-btn" bindtap="clearHistory">清空</text>
+    </view>
+    <view class="history-list">
+      <text 
+        class="history-tag" 
+        wx:for="{{historyList}}" 
+        wx:key="*this"
+        bindtap="searchKeyword"
+        data-keyword="{{item}}"
+      >{{item}}</text>
+    </view>
+  </view>
+
+  <!-- 热门搜索 -->
+  <view class="hot-section" wx:if="{{!hasResult && !keyword}}">
+    <view class="section-header"><text>热门搜索</text></view>
+    <view class="hot-list">
+      <view 
+        class="hot-item" 
+        wx:for="{{hotKeywords}}" 
+        wx:key="*this"
+        bindtap="searchKeyword"
+        data-keyword="{{item}}"
+      >{{item}}</view>
+    </view>
+  </view>
+
+  <!-- 搜索结果 -->
+  <view class="result-section" wx:if="{{hasResult}}">
+    <view class="result-header">
+      <text>找到 {{resultList.length}} 个结果</text>
+      <text class="sort-text" bindtap="toggleSort">{{sortLabel}}</text>
+    </view>
+
+    <view class="product-list">
+      <view 
+        class="product-card" 
+        wx:for="{{resultList}}" 
+        wx:key="id"
+        bindtap="goDetail"
+        data-id="{{item.id}}"
+      >
+        <image class="product-img" src="{{item.image}}" mode="aspectFill" />
+        <view class="product-info">
+          <text class="product-title ellipsis-2">{{item.title}}</text>
+          <text class="price">¥{{item.price}}</text>
+          <text class="product-sales">已售{{item.sales}}</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="empty-result" wx:if="{{resultList.length === 0}}">
+      <text>没有找到相关商品</text>
+    </view>
+  </view>
+</view>

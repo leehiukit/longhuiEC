@@ -1,0 +1,97 @@
+<!-- 商品详情页 - 有闲甄选 -->
+<view class="page" wx:if="{{product}}">
+  <!-- 图片轮播 -->
+  <swiper class="product-swiper" indicator-dots indicator-color="rgba(255,255,255,0.5)" indicator-active-color="#E8952A" autoplay circular>
+    <swiper-item wx:for="{{product.images}}" wx:key="*this">
+      <image class="swiper-img" src="{{item}}" mode="aspectFill" />
+    </swiper-item>
+  </swiper>
+
+  <!-- 价格信息区 -->
+  <view class="price-section">
+    <view class="price-row">
+      <text class="price-symbol">¥</text>
+      <text class="price-num">{{product.price}}</text>
+      <text class="price-original">¥{{product.originalPrice}}</text>
+    </view>
+    <view class="save-badge">
+      <text>甄选价 立省 ¥{{product.originalPrice - product.price}}</text>
+    </view>
+  </view>
+
+  <!-- 商品标题 -->
+  <view class="title-section">
+    <text class="product-title">{{product.title}}</text>
+    <view class="meta-tags">
+      <text class="condition-tag">{{product.condition || '品质好物'}}</text>
+      <text class="sales-tag">已售{{product.sales}}件</text>
+      <text class="rating-tag">★ {{product.rating}}分</text>
+    </view>
+  </view>
+
+  <!-- 成色说明 -->
+  <view class="section">
+    <view class="section-header"><text>成色说明</text></view>
+    <view class="section-body">
+      <text>{{product.conditionDesc || '经过专业检测，功能完好，外观整洁'}}</text>
+    </view>
+  </view>
+
+  <!-- 规格参数 -->
+  <view class="section" wx:if="{{specList.length > 0}}">
+    <view class="section-header"><text>规格参数</text></view>
+    <view class="specs-list">
+      <view class="spec-item" wx:for="{{specList}}" wx:key="label">
+        <text class="spec-label">{{item.label}}</text>
+        <text class="spec-value">{{item.value}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 服务保障 -->
+  <view class="section guarantee-section">
+    <view class="section-header"><text>有闲保障</text></view>
+    <view class="guarantee-grid">
+      <view class="guarantee-item" wx:for="{{guarantees}}" wx:key="*this">
+        <text class="g-icon">{{item.icon}}</text>
+        <text class="g-text">{{item.text}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 商品描述 -->
+  <view class="section desc-section">
+    <view class="section-header"><text>商品详情</text></view>
+    <view class="desc-content">
+      <text>{{product.description}}</text>
+    </view>
+  </view>
+
+  <!-- 品牌水印 -->
+  <view class="brand-watermark">
+    <text class="watermark-text">有闲甄选 · 品质保证</text>
+  </view>
+
+  <!-- 底部操作栏 -->
+  <view class="bottom-bar safe-area-bottom">
+    <view class="action-left">
+      <view class="action-btn" bindtap="goHome">
+        <text class="a-icon">🏠</text>
+        <text>首页</text>
+      </view>
+      <view class="action-btn" bindtap="goCart">
+        <text class="a-icon">🛒</text>
+        <text>购物车</text>
+        <view class="badge" wx:if="{{cartCount > 0}}">{{cartCount}}</view>
+      </view>
+      <view class="action-btn" bindtap="toggleFavorite">
+        <text class="a-icon">{{isFav ? '❤️' : '🤍'}}</text>
+        <text>收藏</text>
+      </view>
+    </view>
+    <view class="action-right">
+      <button class="btn-cart" bindtap="addToCart">加入购物车</button>
+      <button class="btn-buy" bindtap="buyNow">立即购买</button>
+    </view>
+  </view>
+</view>

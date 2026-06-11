@@ -1,0 +1,55 @@
+<!-- 评价详情页面 -->
+<view class="container" wx:if="{{!loading}}">
+  <!-- 商品信息 -->
+  <view class="product-section" wx:if="{{review.product}}">
+    <image class="product-image" src="{{review.product.image}}" mode="aspectFill" />
+    <view class="product-info">
+      <text class="product-title">{{review.product.title}}</text>
+      <text class="product-price">¥{{review.product.price}}</text>
+    </view>
+  </view>
+
+  <!-- 评价内容 -->
+  <view class="review-section">
+    <view class="review-header">
+      <view class="user-info">
+        <image class="avatar" src="{{review.avatar || '/images/default-avatar.png'}}" />
+        <view class="user-detail">
+          <text class="nickname">{{review.anonymous ? '匿名用户' : review.nickname}}</text>
+          <text class="time">{{review.createTimeText}}</text>
+        </view>
+      </view>
+      <view class="rating">
+        <text class="star" wx:for="{{[1,2,3,4,5]}}" wx:key="*this">{{index < review.rating ? '★' : '☆'}}</text>
+      </view>
+    </view>
+
+    <!-- 标签 -->
+    <view class="tags" wx:if="{{review.tags && review.tags.length > 0}}">
+      <text class="tag" wx:for="{{review.tags}}" wx:key="*this">{{item}}</text>
+    </view>
+
+    <!-- 评价文字 -->
+    <view class="content" wx:if="{{review.content}}">
+      <text>{{review.content}}</text>
+    </view>
+
+    <!-- 评价图片 -->
+    <view class="images" wx:if="{{review.images && review.images.length > 0}}">
+      <image 
+        class="review-image" 
+        wx:for="{{review.images}}" 
+        wx:key="*this"
+        src="{{item}}" 
+        mode="aspectFill"
+        data-src="{{item}}"
+        bindtap="previewImage"
+      />
+    </view>
+  </view>
+</view>
+
+<!-- 加载中 -->
+<view class="loading" wx:if="{{loading}}">
+  <text>加载中...</text>
+</view>

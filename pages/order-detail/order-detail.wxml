@@ -1,0 +1,202 @@
+<!-- 订单详情 - 有闲甄选 -->
+<view class="page" wx:if="{{order}}">
+  <!-- 状态头部 -->
+  <view class="status-header" style="background: linear-gradient(135deg, {{statusInfo.color}}22, {{statusInfo.color}}08);">
+    <text class="status-icon">{{statusInfo.icon}}</text>
+    <text class="status-label" style="color:{{statusInfo.color}};">{{statusInfo.label}}</text>
+    <!-- 待付款倒计时 -->
+    <text class="status-remaining" wx:if="{{order.status === 'pending' && order.remainingText}}">
+      ⏱ {{order.remainingText}}
+    </text>
+  </view>
+
+  <!-- 进度条（非取消/售后态时显示） -->
+  <view class="progress-section" wx:if="{{order.status !== 'cancelled' && order.status !== 'afterSale'}}">
+    <view class="progress-bar">
+      <view class="progress-track">
+        <view class="progress-fill" style="width: {{currentStep / (progressSteps.length - 1) * 100}}%;"></view>
+        <view
+          class="progress-dot {{item.done ? 'done' : ''}} {{item.current ? 'current' : ''}}"
+          wx:for="{{progressSteps}}"
+          wx:key="key"
+          style="left: {{index / (progressSteps.length - 1) * 100}}%;"
+        >
+          <text>{{item.icon}}</text>
+        </view>
+      </view>
+    </view>
+    <view class="progress-labels">
+      <view
+        class="progress-label {{item.done ? 'done' : ''}} {{item.current ? 'current' : ''}}"
+        wx:for="{{progressSteps}}"
+        wx:key="key"
+      >{{item.label}}</view>
+    </view>
+  </view>
+
+  <!-- 收货地址 -->
+  <view class="section address-section" wx:if="{{order.address}}">
+    <view class="section-title">
+      <text>📍</text>
+      <text>收货信息</text>
+    </view>
+    <view class="address-content">
+      <text class="address-person">{{order.buyerName || '收货人'}} {{order.buyerPhone || ''}}</text>
+      <text class="address-detail">{{order.address.province}}{{order.address.city}}{{order.address.district}} {{order.address.detail}}</text>
+    </view>
+  </view>
+
+  <!-- 商品列表 -->
+  <view class="section">
+    <view class="section-title">
+      <text>🛒</text>
+      <text>商品信息</text>
+    </view>
+    <view
+      class="detail-product"
+      wx:for="{{order.items}}"
+      wx:for-item="product"
+      wx:key="id"
+    >
+      <image class="product-img" src="{{product.image}}" mode="aspectFill" />
+      <view class="product-info">
+        <text class="product-title ellipsis-2">{{product.title}}</text>
+        <view class="product-bottom">
+          <text class="product-price">¥{{product.price}}</text>
+          <text class="product-qty">×{{product.quantity}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 价格明细 -->
+  <view class="section">
+    <view class="section-title">
+      <text>💰</text>
+      <text>价格明细</text>
+    </view>
+    <view class="price-row">
+      <text class="price-label">商品总价</text>
+      <text class="price-value">¥{{order.totalAmount.toFixed(2)}}</text>
+    </view>
+    <view class="price-row" wx:if="{{order.freight || order.discount}}">
+      <text class="price-label">运费</text>
+      <text class="price-value" wx:if="{{order.freight > 0}}">¥{{order.freight.toFixed(2)}}</text>
+      <text class="price-value free" wx:else>免运费</text>
+    </view>
+    <view class="price-row" wx:if="{{order.couponName}}">
+      <text class="price-label">优惠券</text>
+      <text class="price-value discount">-¥{{order.couponAmount.toFixed(2)}}</text>
+    </view>
+    <view class="price-row total">
+      <text class="price-label">实付款</text>
+      <text class="price-value final">¥{{order.finalPrice.toFixed(2)}}</text>
+    </view>
+  </view>
+
+  <!-- 订单信息 -->
+  <view class="section">
+    <view class="section-title">
+      <text>📋</text>
+      <text>订单信息</text>
+    </view>
+    <view class="info-row">
+      <text class="info-label">订单编号</text>
+      <text class="info-value">{{order.orderNo || order.id}}</text>
+    </view>
+    <view class="info-row">
+      <text class="info-label">下单时间</text>
+      <text class="info-value">{{order.createdAt}}</text>
+    </view>
+    <view class="info-row" wx:if="{{order.shippedAt}}">
+      <text class="info-label">发货时间</text>
+      <text class="info-value">{{order.shippedAt}}</text>
+    </view>
+    <view class="info-row" wx:if="{{order.deliveredAt}}">
+      <text class="info-label">签收时间</text>
+      <text class="info-value">{{order.deliveredAt}}</text>
+    </view>
+  </view>
+
+  <!-- 物流追踪（顺丰） -->
+  <view class="section logistics-section" wx:if="{{showLogistics}}">
+    <view class="section-title">
+      <text>🚚</text>
+      <text>物流追踪</text>
+      <text class="carrier-tag">顺丰速运</text>
+    </view>
+    <view class="tracking-card">
+      <view class="tracking-header">
+        <view class="sf-logo">SF</view>
+        <view class="tracking-info">
+          <text class="tracking-carrier">顺丰速运</text>
+          <text class="tracking-no">运单号：{{order.trackingNumber}}</text>
+        </view>
+      </view>
+      <view class="tracking-actions">
+        <view class="tracking-btn secondary" bindtap="copyTracking">
+          复制单号
+        </view>
+        <view class="tracking-btn primary" bindtap="openTracking">
+          查看物流
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 操作按钮区 -->
+  <view class="actions-section">
+    <!-- 待付款 -->
+    <block wx:if="{{order.status === 'pending'}}">
+      <button class="action-btn cancel" bindtap="cancelOrder">取消订单</button>
+      <button class="action-btn primary" bindtap="goPay">去支付</button>
+    </block>
+
+    <!-- 待发货 -->
+    <block wx:if="{{order.status === 'paid'}}">
+      <button
+        class="action-btn cancel"
+        wx:if="{{!order.refundId}}"
+        data-type="refund"
+        bindtap="applyAfterSale"
+      >申请退款</button>
+    </block>
+
+    <!-- 运输中（已发货）→ 查物流 + 确认收货 -->
+    <block wx:if="{{order.status === 'shipped'}}">
+      <button
+        class="action-btn cancel"
+        wx:if="{{!order.refundId}}"
+        data-type="return"
+        bindtap="applyAfterSale"
+      >申请退货</button>
+      <button class="action-btn primary" bindtap="confirmReceive">确认收货</button>
+    </block>
+
+    <!-- 已签收 → 确认完成 -->
+    <block wx:if="{{order.status === 'delivered'}}">
+      <button class="action-btn primary" bindtap="confirmComplete">确认完成</button>
+    </block>
+
+    <!-- 已完成 → 评价 -->
+    <block wx:if="{{order.status === 'completed'}}">
+      <button
+        class="action-btn cancel"
+        wx:if="{{!order.refundId}}"
+        data-type="return"
+        bindtap="applyAfterSale"
+      >申请售后</button>
+      <button class="action-btn primary" bindtap="goReview">
+        {{order.reviewed ? '查看评价' : '去评价'}}
+      </button>
+    </block>
+
+    <!-- 售后相关 -->
+    <block wx:if="{{order.refundId}}">
+      <button class="action-btn outline" bindtap="viewRefund">查看售后详情</button>
+    </block>
+  </view>
+
+  <!-- 底部安全区 -->
+  <view class="bottom-safe"></view>
+</view>
