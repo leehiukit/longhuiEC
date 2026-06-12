@@ -162,5 +162,54 @@ Page({
         }
       }
     })
-  }
+  },
+
+  // 注销账号
+  handleDeleteAccount() {
+    wx.showModal({
+      title: '注销账号',
+      content: '注销后，您的个人信息将被删除或匿名化处理，订单记录将保留以满足财务合规要求。\n\n此操作不可撤销，确定继续吗？',
+      confirmText: '确认注销',
+      confirmColor: '#ff4d4f',
+      success: (res) => {
+        if (res.confirm) {
+          // 二次确认
+          wx.showModal({
+            title: '再次确认',
+            content: '请再次确认您要永久注销账号，所有个人数据将被清除。',
+            confirmText: '我确定注销',
+            confirmColor: '#ff4d4f',
+            success: (res2) => {
+              if (res2.confirm) {
+                // 清除账号隔离数据
+                const phone = app.getUserPhone()
+                if (phone) {
+                  try {
+                    const allKeys = wx.getStorageInfoSync().keys || []
+                    allKeys.forEach(key => {
+                      if (key.includes(phone)) {
+                        wx.removeStorageSync(key)
+                      }
+                    })
+                  } catch (_) { /* 忽略单个清除错误 */ }
+                }
+                // 清除全局 token
+                wx.removeStorageSync('yxzx_token')
+                wx.removeStorageSync('yxzx_user')
+                // 清除全局数据引用
+                app.globalData.isLoggedIn = false
+                app.globalData.userInfo = null
+                app.globalData.openid = ''
+                app.globalData.cart = []
+                wx.showToast({ title: '账号已注销', icon: 'success', duration: 2000 })
+                setTimeout(() => {
+                  wx.reLaunch({ url: '/pages/index/index' })
+                }, 2000)
+              }
+            }
+          })
+        }
+      }
+    })
+  },
 })

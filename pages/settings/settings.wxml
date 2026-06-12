@@ -70,6 +70,11 @@
     <button class="btn-logout" bindtap="handleLogout">退出登录</button>
   </view>
 
+  <!-- 注销账号 -->
+  <view class="delete-section">
+    <view class="btn-delete" bindtap="handleDeleteAccount">注销账号</view>
+  </view>
+
   <view class="footer">
     <text>有闲甄选 v{{appVersion}}</text>
   </view>

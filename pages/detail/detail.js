@@ -53,6 +53,7 @@ Page({
         title: product.title ? (product.title.length > 10 ? product.title.substr(0, 10) + '...' : product.title) : '商品详情'
       })
     } catch (e) {
+      wx.showToast({ title: '加载失败，请下拉重试', icon: 'none' })
     }
   },
 

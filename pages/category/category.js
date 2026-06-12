@@ -49,6 +49,7 @@ Page({
       }
       app.globalData.selectedCategoryId = null
     } catch (e) {
+      wx.showToast({ title: '分类加载失败', icon: 'none' })
     }
   },
 

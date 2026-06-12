@@ -5,9 +5,9 @@
     <view class="header-bg"></view>
     <view class="header-content">
       <!-- 用户信息 -->
-      <view class="user-info" wx:if="{{isLoggedIn}}" bindtap="goProfile">
-        <image class="avatar" src="{{userInfo.avatarUrl || '/images/default-avatar.png'}}" />
-        <view class="info-text">
+      <view class="user-info" wx:if="{{isLoggedIn}}">
+        <image class="avatar" src="{{userInfo.avatarUrl || '/images/default-avatar.png'}}" bindtap="updateAvatar" />
+        <view class="info-text" bindtap="editNickname">
           <text class="nickname">{{userInfo.nickName || '甄选会员'}}</text>
           <text class="user-level">Lv.{{userInfo.level || 1}} · 甄选达人</text>
         </view>

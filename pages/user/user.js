@@ -63,26 +63,48 @@ Page({
 
   goLogin() { wx.navigateTo({ url: '/pages/login/login' }) },
 
-  // 获取微信头像/昵称（需用户点击授权）
-  async goProfile() {
-    try {
-      const profile = await API.getUserProfile()
-      const userInfo = {
-        ...(app.globalData.userInfo || {}),
-        nickName: profile.nickName,
-        avatarUrl: profile.avatarUrl
+  // 修改头像：使用 wx.chooseImage 选择新头像
+  updateAvatar() {
+    wx.chooseImage({
+      count: 1,
+      sizeType: ['compressed'],
+      sourceType: ['album'],
+      success: (res) => {
+        const tempPath = res.tempFilePaths[0]
+        const userInfo = {
+          ...(app.globalData.userInfo || {}),
+          avatarUrl: tempPath
+        }
+        app.globalData.userInfo = userInfo
+        wx.setStorageSync('yxzx_user', userInfo)
+        this.setData({ userInfo })
+        wx.showToast({ title: '头像已更新', icon: 'success' })
       }
-      app.globalData.userInfo = userInfo
-      wx.setStorageSync('yxzx_user', userInfo)
-      this.setData({ userInfo })
-      wx.showToast({ title: '资料已更新', icon: 'success' })
-    } catch (err) {
-      if (err.errMsg && err.errMsg.includes('cancel')) {
-        wx.showToast({ title: '已取消', icon: 'none' })
-      } else {
-        wx.showToast({ title: '获取失败，请重试', icon: 'none' })
+    })
+  },
+
+  // 修改昵称：弹窗输入新昵称
+  editNickname() {
+    const { nickName = '' } = this.data.userInfo
+    wx.showModal({
+      title: '修改昵称',
+      editable: true,
+      placeholderText: '请输入新昵称',
+      content: nickName,
+      success: (res) => {
+        if (res.confirm && res.content && res.content.trim()) {
+          const newNick = res.content.trim()
+          const userInfo = {
+            ...(app.globalData.userInfo || {}),
+            nickName: newNick
+          }
+          app.globalData.userInfo = userInfo
+          wx.setStorageSync('yxzx_user', userInfo)
+          this.setData({ userInfo })
+          wx.showToast({ title: '昵称已更新', icon: 'success' })
+        }
       }
-    }
+    })
   },
 
   // 跳转订单列表（带状态筛选）

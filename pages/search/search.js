@@ -70,6 +70,7 @@ Page({
 
       this.setData({ resultList: list, hasResult: true })
     } catch (e) {
+      this.setData({ resultList: [], hasResult: true })
     }
   },
 

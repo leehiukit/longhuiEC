@@ -58,7 +58,6 @@ Page({
           openid = wxResult.openid || ''
         } catch (_) {
           // wx-login 失败不阻断登录，支付时后端可自动查 openid
-          console.warn('[登录] wx-login 获取 openid 失败，支付时将由后端自动查询')
         }
       }
 

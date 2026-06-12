@@ -180,9 +180,9 @@ function phoneLogin(code) {
 }
 
 /**
- * 获取用户头像/昵称（从本地缓存读取，由微信侧提供）
+ * 获取用户头像/昵称（从本地缓存读取）
  */
-function getUserProfile() {
+function getStoredProfile() {
   const stored = wx.getStorageSync('yxzx_user') || {}
   return Promise.resolve({
     nickName: stored.nickName || '',
@@ -594,7 +594,7 @@ module.exports = {
   getMe,
   getPhoneNumber,
   phoneLogin,
-  getUserProfile,
+  getStoredProfile,
   unifiedOrder,
   requestPayment,
   getBanners,

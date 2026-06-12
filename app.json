@@ -61,5 +61,14 @@
   "style": "v2",
   "componentFramework": "glass-easel",
   "sitemapLocation": "sitemap.json",
-  "lazyCodeLoading": "requiredComponents"
+  "lazyCodeLoading": "requiredComponents",
+  "__usePrivacyCheck__": true,
+  "requiredPrivateInfos": [
+    "getPhoneNumber"
+  ],
+  "permission": {
+    "scope.userLocation": {
+      "desc": "用于获取大致位置以提供收货地址建议"
+    }
+  }
 }

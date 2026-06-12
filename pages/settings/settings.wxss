@@ -89,6 +89,26 @@
   display: none;
 }
 
+/* 注销账号 */
+.delete-section {
+  padding: 0 60rpx 40rpx;
+}
+
+.btn-delete {
+  width: 100%;
+  height: 84rpx;
+  font-size: 28rpx;
+  color: #ccc;
+  background: transparent;
+  border: none;
+  border-radius: 42rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: underline;
+  text-underline-offset: 4rpx;
+}
+
 .footer {
   text-align: center;
   padding: 40rpx 0 60rpx;
