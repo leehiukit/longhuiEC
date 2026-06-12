@@ -24,6 +24,7 @@
     <text class="product-title">{{product.title}}</text>
     <view class="meta-tags">
       <text class="condition-tag">{{product.condition || '匠心甄选'}}</text>
+      <text class="stock-tag" wx:if="{{product.stock > 0}}">库存{{product.stock}}件</text>
       <text class="sales-tag">已售{{product.sales}}件</text>
       <text class="rating-tag">★ {{product.rating}}分</text>
     </view>

@@ -124,6 +124,10 @@
   font-size: 22rpx;
   color: #aaa;
 }
+.product-stock {
+  font-size: 22rpx;
+  color: #E8952A;
+}
 .price {
   font-size: 30rpx;
   font-weight: bold;

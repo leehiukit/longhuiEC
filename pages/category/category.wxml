@@ -42,6 +42,7 @@
             <text class="product-title ellipsis-2">{{item.title}}</text>
             <view class="product-price-row">
               <text class="price">¥{{item.price}}</text>
+              <text class="product-stock" wx:if="{{item.stock > 0}}">库存{{item.stock}}件</text>
               <text class="product-sales">已售{{item.sales}}</text>
             </view>
           </view>

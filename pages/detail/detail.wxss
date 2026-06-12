@@ -64,6 +64,10 @@
   font-size: 24rpx;
   color: #999;
 }
+.stock-tag {
+  font-size: 24rpx;
+  color: #E8952A;
+}
 .rating-tag {
   color: #F5C066;
   font-size: 24rpx;

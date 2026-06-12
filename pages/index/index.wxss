@@ -253,6 +253,14 @@
   -webkit-box-orient: vertical;
 }
 .product-specs { font-size: 24rpx; color: #999; margin-top: 10rpx; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.product-meta {
+  display: flex;
+  align-items: center;
+  gap: 18rpx;
+  margin-top: 6rpx;
+}
+.product-stock { font-size: 22rpx; color: #E8952A; }
+.product-sales { font-size: 22rpx; color: #ccc; }
 .product-bottom {
   display: flex;
   align-items: center;
@@ -274,8 +282,6 @@
   border-radius: 8rpx;
   white-space: nowrap;
 }
-.product-sales { font-size: 22rpx; color: #ccc; }
-
 /* 底部提示 */
 .load-more {
   text-align: center;
