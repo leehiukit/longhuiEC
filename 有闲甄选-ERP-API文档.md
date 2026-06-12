@@ -93,9 +93,6 @@ Authorization: Bearer <token>
 
 手机号一键登录（利用微信手机号组件，无需短信验证码）。
 
-> **前端已不再使用此接口。** 统一改为 `wx-login`（拿 openid）+ `phone`（解密手机号）两步。
-> 后端可保留此接口作为快捷通道，但不是必须。
-
 `<button open-type="getPhoneNumber">` 回调拿到 code 后调用，后端解密手机号 → 查/建 User → 签发 JWT。
 
 **Headers:**
@@ -123,6 +120,53 @@ Content-Type: application/json
 ```
 
 > `phone-login` 与 `wx-login` 签发的 JWT 等效，之后所有需鉴权接口均可正常使用。
+
+### POST /api/v1/auth/number-login
+
+本机号码一键登录（阿里云号码认证 H5 SDK）。前端加载阿里云号码认证 JSSDK，调用 `getLoginToken()` 获取 SpToken 后调用此接口。后端通过阿里云 `GetPhoneWithToken` API 换取真实手机号 → 查/建 User → 签发 JWT。
+
+**Headers:**
+```
+Content-Type: application/json
+```
+
+**Body:**
+| 字段 | 类型 | 必填 | 说明 |
+|------|------|:----:|------|
+| spToken | string | ✅ | 前端 SDK 返回的 `result.loginToken` |
+
+**Response (200):**
+```json
+{
+  "ok": true,
+  "data": {
+    "token": "eyJhbGciOiJIUzI1NiJ9...",
+    "phone": "1381234****",
+    "openid": "oXXXXXXXXXXXX",
+    "user": {
+      "id": "cmotmhlu50006p7utol2ncig1",
+      "name": "用户_123...",
+      "role": "OPERATOR"
+    }
+  }
+}
+```
+
+**Response (400 / 错误):**
+```json
+{
+  "ok": false,
+  "error": "取号失败：未返回手机号"
+}
+```
+
+> **前置条件：** 服务端需配置阿里云 AccessKey（`ALI_SMS_ACCESS_KEY_ID` / `ALI_SMS_ACCESS_KEY_SECRET`），前端需加载阿里云号码认证 H5 SDK（`numberAuthSDK_WEB_H5_vX.X.X_operator_ui_log_static.js`），并已开通号码认证服务。
+
+> **注意事项：**
+> - 仅在手机 4G/5G 蜂窝网络下可用（Wi-Fi 无效）
+> - 取号网关需要 DNS 劫持支持，部分 Wi-Fi 网络下可能失败
+> - 新用户首次登录自动创建 User（role = OPERATOR）
+> - 签发的 JWT 与 `wx-login` / `phone-login` 等效
 
 ### GET /api/v1/auth/me
 
@@ -315,7 +359,7 @@ Authorization: Bearer <token>
 | orderNo | string | ✅ | ERP 订单号（作为 `out_trade_no`） |
 | totalFee | integer | ✅ | 支付金额，单位：**分**（¥2999.00 传 `299900`） |
 | body | string | ✅ | 商品描述，显示在微信支付账单中 |
-| openid | string | ✅ | 用户 openid（从 wx-login 获取） |
+| openid | string | ❌ | 用户 openid。不传时后端自动从数据库查询当前登录用户的 openid（需先通过微信登录绑定过） |
 | attach | string | ❌ | 附加数据，支付通知时原样返回 |
 
 **Response:**
@@ -730,6 +774,7 @@ Content-Type: multipart/form-data
 | POST | `/api/v1/auth/login` | 无 | 邮箱密码登录 |
 | POST | `/api/v1/auth/wx-login` | 无 | 微信小程序登录 |
 | POST | `/api/v1/auth/phone-login` | 无 | 手机号一键登录 |
+| POST | `/api/v1/auth/number-login` | 无 | 本机号码一键登录（H5 号码认证） |
 | GET | `/api/v1/auth/me` | Bearer | 获取当前用户 |
 | POST | `/api/v1/auth/phone` | Bearer | 微信手机号解密 |
 | GET | `/api/v1/customers/me` | Bearer | 客户档案 + 可用优惠券 |
@@ -848,6 +893,7 @@ const payRes = await wx.request({
     orderNo: order.data.orderNo,
     totalFee: finalOrder.data.totalAmount * 100,  // 元转分
     body: 'ThinkPad X1 Carbon',
+    // openid 可选；不传时后端自动从数据库查询当前用户的 openid
     openid
   }
 })

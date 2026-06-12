@@ -336,12 +336,8 @@ Page({
       const totalFee = Math.round(parseFloat(this.data.finalPrice) * 100)
       const orderNo = this.currentOrderNo || order.id
       const openid = app.globalData.openid || ''
+      // openid 现为可选，后端自动从数据库查询已绑定用户的 openid
 
-      // 参数校验
-      if (!openid) {
-        this.setData({ paying: false })
-        return wx.showToast({ title: '请先微信授权登录', icon: 'none' })
-      }
       if (!this.currentOrderNo) {
         // 未检测到 ERP 订单号，将使用本地 ID 支付
       }

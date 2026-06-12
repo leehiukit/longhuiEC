@@ -202,7 +202,7 @@ function getUserProfile() {
  *   orderNo: "ERP 订单号",
  *   totalFee: 金额（分，整数）,
  *   body: "商品描述",
- *   openid: "用户 openid",
+ *   openid: "用户 openid（可选，不传时后端自动查数据库）",
  *   attach: "附加数据（可选）"
  * }
  *
