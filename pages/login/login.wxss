@@ -61,21 +61,20 @@
   flex-direction: row;
   align-items: center;
   justify-content: center;
-  gap: 14rpx;
+  gap: 12rpx;
   height: 94rpx;
   line-height: 94rpx;
   background: linear-gradient(135deg, #E8952A, #F5C066);
   color: #fff;
-  font-size: 34rpx;
+  font-size: 32rpx;
   font-weight: 500;
   border-radius: 47rpx;
   border: none;
   box-shadow: 0 8rpx 28rpx rgba(232,149,42,0.35);
-  letter-spacing: 4rpx;
-  padding-left: 10rpx;
-  padding-right: 10rpx;
+  letter-spacing: 2rpx;
+  padding-left: 16rpx;
+  padding-right: 16rpx;
   box-sizing: border-box;
-  overflow: hidden;
 }
 .btn-phone-login::after { display: none; }
 .btn-phone-login text {
