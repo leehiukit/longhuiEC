@@ -174,7 +174,9 @@ Page({
 
   /**
    * 微信一键登录（getPhoneNumber 回调）
-   * 流程：① wxLogin() 拿 token+openid → ② 暂存 token → ③ phone API 解密手机号 → 完成登录
+   * ★ 关键：wx.login() 不能先于 getPhoneNumber code 调用！
+   *   wx.login 会刷新 session_key → 导致 phone code 立即失效 → 后端无法解密手机号。
+   * 流程：① phoneLogin(code) → 解密手机号+拿 token → ② wx.login() → 补 openid → 完成登录
    */
   async onGetPhone(e) {
     if (e.detail.errMsg && e.detail.errMsg.includes('fail')) {
@@ -185,41 +187,31 @@ Page({
       return wx.showToast({ title: '请先同意协议', icon: 'none' })
     }
 
+    if (!e.detail.code) {
+      return wx.showToast({ title: '未获取到授权码，请重试', icon: 'none' })
+    }
+
     this.setData({ wechatLogging: true })
     wx.showLoading({ title: '微信授权中...', mask: true })
 
     try {
-      // ① wx.login → 换取 openid + token
-      const loginResult = await API.wxLogin()
-      const openid = loginResult.openid || ''
-      const wxToken = loginResult.token
-
-      if (!wxToken) {
-        throw new Error('微信登录未返回 token')
-      }
-
-      // ★ ② 关键修复：立即把 token 写入 storage（getPhoneNumber 需要用这个 token 鉴权）
-      wx.setStorageSync(TOKEN_KEY, {
-        token: wxToken,
-        openid,
-        createdAt: Date.now(),
-        expiresAt: Date.now() + TOKEN_EXPIRE_DAYS * 24 * 60 * 60 * 1000
-      })
-
-      // ③ 用暂存的 token 鉴权解密手机号
-      let phone = ''
-      try {
-        const phoneResult = await API.getPhoneNumber(e)
-        phone = phoneResult.phoneNumber || ''
-      } finally {
-        // ★ 如果解密失败，清除已暂存的 token，避免脏数据
-        if (!phone) {
-          wx.removeStorageSync(TOKEN_KEY)
-        }
-      }
+      // ★ ① 必须先用 phone code 解密手机号（绝不能在这之前调 wx.login）
+      const result = await API.phoneLogin(e.detail.code)
+      const phone = result.phone
 
       if (!phone) {
         throw new Error('未获取到手机号')
+      }
+
+      // ★ ② 手机号解密完成后，再调 wx.login 拿 openid（此时 session 刷新不影响）
+      let openid = result.openid || ''
+      if (!openid) {
+        try {
+          const wxResult = await API.wxLogin()
+          openid = wxResult.openid || ''
+        } catch (_) {
+          // wx-login 失败不阻断登录
+        }
       }
 
       const existingUser = this.getExistingUser(phone)
@@ -235,9 +227,10 @@ Page({
             registerTime: new Date().toISOString()
           }
 
-      // 更新 token 信息（补充 phone）
       wx.setStorageSync(TOKEN_KEY, {
-        token: wxToken, openid, phone,
+        token: result.token,
+        openid,
+        phone,
         createdAt: Date.now(),
         expiresAt: Date.now() + TOKEN_EXPIRE_DAYS * 24 * 60 * 60 * 1000
       })
@@ -265,8 +258,6 @@ Page({
     } catch (err) {
       wx.hideLoading()
       this.setData({ wechatLogging: false })
-      // ★ 确保错误时清除 token
-      wx.removeStorageSync(TOKEN_KEY)
       wx.showToast({ title: err.message || '微信登录失败', icon: 'none' })
     }
   },
