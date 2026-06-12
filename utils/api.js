@@ -168,6 +168,7 @@ function getPhoneNumber(e) {
  */
 function phoneLogin(code) {
   return new Promise((resolve, reject) => {
+    if (!code) return reject(new Error('缺少code参数'))
     erpRequest('POST', '/api/v1/auth/phone-login', { code }, { useUser: false })
       .then(res => {
         if (!res.token) return reject(new Error('后端未返回 token'))

@@ -20,19 +20,6 @@ Page({
       pages.length >= 2 ? wx.navigateBack() : wx.switchTab({ url: '/pages/user/user' })
       return
     }
-    // ★ 主动触发微信隐私授权弹窗，确保 getPhoneNumber 不被拦截
-    this.requirePrivacy()
-  },
-
-  // 主动请求隐私授权（兼容基础库 2.32.3+）
-  requirePrivacy() {
-    if (typeof wx.requirePrivacyAuthorize === 'function') {
-      wx.requirePrivacyAuthorize({
-        success: () => { /* 用户已同意隐私协议 */ },
-        fail: () => { /* 用户拒绝，按钮仍然可用但 API 调用会被拦截 */ },
-        complete: () => { /* 不做额外处理 */ }
-      })
-    }
   },
 
   /* ==================== 本机号码一键登录 ==================== */
@@ -50,6 +37,11 @@ Page({
 
     if (!this.data.agreed) {
       return wx.showToast({ title: '请先同意协议', icon: 'none' })
+    }
+
+    // ★ 校验 code 是否存在（新设备/未授权时可能为空）
+    if (!e.detail.code) {
+      return wx.showToast({ title: '未获取到授权码，请重试', icon: 'none' })
     }
 
     this.setData({ phoneLogging: true })

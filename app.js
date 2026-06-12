@@ -19,21 +19,6 @@ App({
     this.migrateStorageKeys()
     this.checkLoginStatus()
     this.initCart()
-    this.initPrivacy()
-  },
-
-  // ★ 隐私授权处理（__usePrivacyCheck__: true 必需）
-  initPrivacy() {
-    if (typeof wx.onNeedPrivacyAuthorization === 'function') {
-      wx.onNeedPrivacyAuthorization((resolve) => {
-        // 触发隐私弹窗，用户同意后 resolve 回调才会继续执行
-        // WeChat 基础库 3.0.0+ 会自动处理弹窗，这里做兜底
-        if (typeof resolve === 'function') {
-          resolve({ event: 'agree' })
-        }
-      })
-    }
-  },
 
   // Storage Key 迁移（兼容旧版本数据）
   migrateStorageKeys() {
