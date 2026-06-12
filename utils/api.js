@@ -293,8 +293,8 @@ function fixProduct(p) {
     specsText: p.specs || '',
     sortOrder: p.sortOrder || 0,
     sales: 0,
-    condition: '品质好物',
-    conditionDesc: '经过专业检测，功能完好，外观整洁',
+    condition: '匠心甄选',
+    conditionDesc: '每件商品均通过专业团队12道严苛检测工序，涵盖外观成色评估、屏幕触控灵敏测试、电池健康度与续航实测、摄像头光学成像校验、全端口连接性验证、扬声器/麦克风清晰度测试、WiFi与蓝牙信号稳定检测、CPU/GPU满载压力测试等。确保功能100%完好、外观至多达A+级标准，性能稳如新品。',
     rating: '4.8'
   }
 }
