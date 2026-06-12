@@ -321,7 +321,7 @@ function searchProducts(keyword) {
  * 本地预设分类 + ERP 商品动态分类合并
  */
 async function getCategories() {
-  // 品牌分类与对应图标（真实配置）
+  // 品牌分类与对应图标（真实配置，始终作为基础展示）
   const CATEGORY_ICONS = {
     'Apple':      '/images/logos/apple.png',
     'ThinkPad':    '/images/logos/thinkpad.jpg',
@@ -337,21 +337,26 @@ async function getCategories() {
     '其他':        '/images/logos/other.png'
   }
 
+  // 基础分类：始终展示全部品牌
+  const base = Object.entries(CATEGORY_ICONS).map(([name, iconImage]) => ({
+    id: name,
+    name,
+    iconImage
+  }))
+
   try {
-    // 从 ERP 拉取所有商品，提取去重分类
+    // 从 ERP 拉取所有商品，提取去重分类，追加基础分类之外的新增分类
     const res = await getProducts({ pageSize: 50 })
     const erpCats = [...new Set(res.data.map(p => p.category).filter(Boolean))]
+    const baseIds = new Set(base.map(c => c.id))
+    erpCats.forEach(c => {
+      if (!baseIds.has(c)) {
+        base.push({ id: c, name: c, iconImage: '/images/logos/other.png' })
+      }
+    })
+  } catch (_) { /* ERP 不可用时仍展示基础分类 */ }
 
-    // 已配置的用对应图标，ERP 新增分类用默认图标
-    const data = erpCats.map(c => ({
-      id: c,
-      name: c,
-      iconImage: CATEGORY_ICONS[c] || '/images/logos/other.png'
-    }))
-    return { code: 0, data }
-  } catch (e) {
-    return { code: 0, data: [] }
-  }
+  return { code: 0, data: base }
 }
 
 /**
