@@ -418,6 +418,7 @@ GET /api/v1/products?category=Apple
       "price": 2999,
       "costRange": null,
       "stockQty": 1,
+      "virtualStock": 10,
       "status": "ONLINE",
       "published": true,
       "specs": null,
