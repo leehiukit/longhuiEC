@@ -158,10 +158,10 @@ Page({
     this.setData({ submitting: true })
 
     wx.showLoading({ title: '提交中...' })
-    setTimeout(() => {
-      wx.hideLoading()
 
-      const refund = app.applyRefund({
+    wx.hideLoading()
+
+    const refund = app.applyRefund({
         orderId: this.data.orderId,
         orderAmount: this.data.order.finalPrice,
         type: this.data.refundType,
@@ -180,37 +180,29 @@ Page({
         }).then(() => {
           // ② 仅退款（未发货）→ 直接调用退款接口原路退钱
           if (this.data.refundType === 'refund') {
-            console.log('[退款] 仅退款，直接发起微信退款:', orderNo, refundAmount)
             API.paymentRefund(orderNo, refundAmount, REFUND_REASONS[reasonIndex])
               .then(refundRes => {
-                console.log('[退款] 退款成功:', JSON.stringify(refundRes))
-                // 更新本地退款状态
                 app.updateRefundStatus(refund.id, 'refunded', {
                   refundAmount: refundRes.refundAmount || refundAmount,
                   erpRefundId: refundRes.refundId
                 })
               })
-              .catch(err => {
-                console.error('[退款] 退款接口失败:', err.message || err)
-              })
+              .catch(() => {})
           }
-        }).catch(err => {
-          console.error('[退款] ERP 回调失败:', err.message || err)
-        })
+        }).catch(() => {})
       }
 
-      this.setData({ submitting: false })
+    this.setData({ submitting: false })
 
-      wx.showToast({
-        title: '申请已提交',
-        icon: 'success',
-        duration: 1800,
-        complete: () => {
-          setTimeout(() => {
-            wx.redirectTo({ url: `/pages/refund-detail/refund-detail?refundId=${refund.id}` })
-          }, 1800)
-        }
-      })
-    }, 800)
+    wx.showToast({
+      title: '申请已提交',
+      icon: 'success',
+      duration: 1800,
+      complete: () => {
+        setTimeout(() => {
+          wx.redirectTo({ url: `/pages/refund-detail/refund-detail?refundId=${refund.id}` })
+        }, 1800)
+      }
+    })
   }
 })

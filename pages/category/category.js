@@ -49,7 +49,6 @@ Page({
       }
       app.globalData.selectedCategoryId = null
     } catch (e) {
-      // console.error('加载分类失败:', e)
     }
   },
 
@@ -81,7 +80,6 @@ Page({
       }
       this.setData({ products, loading: false })
     } catch (e) {
-      // console.error('加载商品失败:', e)
       this.setData({ loading: false })
     }
   },

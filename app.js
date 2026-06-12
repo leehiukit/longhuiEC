@@ -1,13 +1,6 @@
 // app.js - 有闲甄选 入口文件
 const API = require('./utils/api')
 
-// ERP 后台管理员凭证（小程序客户端自动登录，用户无感知）
-// 管理员通过 ERP Web 后台管理，小程序仅作为 API 鉴权用
-const ERP_ADMIN = {
-  email: 'admin@local.erp',
-  password: 'admin123'
-}
-
 // 需要按账号隔离的数据 key（登录后会用 phone 做命名空间）
 const SCOPED_KEYS = [
   'yxzx_addresses',
@@ -24,27 +17,8 @@ const SCOPED_KEYS = [
 App({
   onLaunch() {
     this.migrateStorageKeys()
-    this.initTestData()   // 未归属的演示数据 → 测试账号
-    this.erpAutoLogin()  // 自动登录 ERP 拿 token
     this.checkLoginStatus()
     this.initCart()
-  },
-
-  // 自动登录 ERP 后台，拿 JWT token 供后续 API 调用
-  async erpAutoLogin() {
-    try {
-      const res = await API.adminLogin(ERP_ADMIN.email, ERP_ADMIN.password)
-      const tokenData = {
-        token: res.token,
-        user: res.user || {},
-        createdAt: Date.now(),
-        expiresAt: Date.now() + 7 * 24 * 60 * 60 * 1000
-      }
-      wx.setStorageSync('yxzx_erp_token', tokenData)
-      // console.log('[ERP] 自动登录成功')
-    } catch (e) {
-      // console.warn('[ERP] 自动登录失败:', e.message)
-    }
   },
 
   // Storage Key 迁移（兼容旧版本数据）
@@ -65,67 +39,6 @@ App({
         }
       } catch (e) { /* 忽略迁移错误 */ }
     })
-  },
-
-  // 将未归属的演示数据一次性迁移到测试账号（首次启动执行一次）
-  initTestData() {
-    const TEST_PHONE = '13800138000'
-    // 已经迁移过则跳过
-    if (wx.getStorageSync('__test_data_migrated__')) return
-
-    const ALL_KEYS = (() => {
-      try { return (wx.getStorageInfoSync().keys || []) } catch (_) { return [] }
-    })()
-
-    SCOPED_KEYS.forEach(baseKey => {
-      try {
-        const testKey = `${baseKey}_${TEST_PHONE}`
-        let testData = wx.getStorageSync(testKey)
-        if (testData === '' || testData === undefined) testData = null
-
-        // 1. 先收集其他 scoped keys（yxzx_orders_138xxxx 等非测试账号的）迁移到测试账号
-        ALL_KEYS
-          .filter(k => k.startsWith(`${baseKey}_`) && k !== testKey)
-          .forEach(k => {
-            try {
-              const data = wx.getStorageSync(k)
-              if (data && (!Array.isArray(data) || data.length > 0)) {
-                if (Array.isArray(data)) {
-                  testData = Array.isArray(testData) ? [...data, ...testData] : [...data]
-                } else if (typeof data === 'object') {
-                  testData = testData || {}
-                  Object.assign(testData, data)
-                } else {
-                  testData = data
-                }
-                wx.removeStorageSync(k)
-              }
-            } catch (_) { /* */ }
-          })
-
-        // 2. 再迁移 unscoped 全局 key
-        const oldData = wx.getStorageSync(baseKey)
-        if (oldData !== '' && oldData !== undefined && (!Array.isArray(oldData) || oldData.length > 0)) {
-          if (Array.isArray(oldData)) {
-            testData = Array.isArray(testData) ? [...oldData, ...testData] : [...oldData]
-          } else if (typeof oldData === 'object') {
-            testData = testData || {}
-            Object.assign(testData, oldData)
-          } else {
-            testData = testData || oldData
-          }
-          wx.removeStorageSync(baseKey)
-        }
-
-        // 写入测试账号
-        if (testData && (!Array.isArray(testData) || testData.length > 0)) {
-          wx.setStorageSync(testKey, testData)
-        }
-      } catch (_) { /* */ }
-    })
-
-    // 标记已迁移，下次启动不再重复
-    wx.setStorageSync('__test_data_migrated__', true)
   },
 
   // 获取当前账号标识（手机号），未登录返回 null

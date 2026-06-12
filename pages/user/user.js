@@ -109,8 +109,6 @@ Page({
     }
     if (url && url.startsWith('/pages/')) {
       wx.navigateTo({ url })
-    } else {
-      wx.showToast({ title: '功能开发中...', icon: 'none' })
     }
   },
 

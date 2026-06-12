@@ -40,7 +40,7 @@
 
     <view class="row" bindtap="checkUpdate">
       <text class="row-label">检查更新</text>
-      <text class="row-value">v1.0.0</text>
+      <text class="row-value">v{{appVersion}}</text>
       <text class="arrow">›</text>
     </view>
   </view>
@@ -71,6 +71,6 @@
   </view>
 
   <view class="footer">
-    <text>有闲甄选 v1.0.0</text>
+    <text>有闲甄选 v{{appVersion}}</text>
   </view>
 </view>

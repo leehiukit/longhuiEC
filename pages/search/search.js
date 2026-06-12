@@ -70,7 +70,6 @@ Page({
 
       this.setData({ resultList: list, hasResult: true })
     } catch (e) {
-      // console.error('搜索失败:', e)
     }
   },
 

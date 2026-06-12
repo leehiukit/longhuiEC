@@ -51,7 +51,6 @@ Page({
         title: product.title ? (product.title.length > 10 ? product.title.substr(0, 10) + '...' : product.title) : '商品详情'
       })
     } catch (e) {
-      // console.error('加载失败:', e)
     }
   },
 

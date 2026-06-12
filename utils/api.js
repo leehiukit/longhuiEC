@@ -47,8 +47,6 @@ function erpRequest(method, url, data, opts = {}) {
             errMsg = body.errmsg
           }
           if (!errMsg) errMsg = '请求失败 (' + res.statusCode + ')'
-          // 附加调试信息（控制台可见）
-          console.error('[ERP] ' + method + ' ' + url, 'status=' + res.statusCode, 'body=', JSON.stringify(res.data).slice(0, 300))
           reject(new Error(errMsg))
         }
       },
@@ -156,12 +154,12 @@ function getPhoneNumber(e) {
 }
 
 /**
- * 获取微信头像/昵称
+ * 获取用户头像/昵称（从本地缓存读取，由微信侧提供）
  */
 function getUserProfile() {
   const stored = wx.getStorageSync('yxzx_user') || {}
   return Promise.resolve({
-    nickName: stored.nickName || '甄选会员',
+    nickName: stored.nickName || '',
     avatarUrl: stored.avatarUrl || '',
     gender: 0
   })
@@ -323,39 +321,14 @@ function searchProducts(keyword) {
  * 本地预设分类 + ERP 商品动态分类合并
  */
 async function getCategories() {
-  // 本地预设分类（带品牌图标）
-  const LOCAL_CATEGORIES = [
-    { id: 'Apple',        name: 'Apple',      iconImage: '/images/logos/apple.png' },
-    { id: 'ThinkPad',     name: 'ThinkPad',    iconImage: '/images/logos/thinkpad.jpg' },
-    { id: '华为',         name: '华为',        iconImage: '/images/logos/huawei.jpg' },
-    { id: '联想',         name: '联想',        iconImage: '/images/logos/lenovo.jpg' },
-    { id: '华硕',         name: '华硕',        iconImage: '/images/logos/asus.png' },
-    { id: '惠普',         name: '惠普',        iconImage: '/images/logos/hp.jpeg' },
-    { id: '戴尔',         name: '戴尔',        iconImage: '/images/logos/dell.png' },
-    { id: '微软',         name: '微软',        iconImage: '/images/logos/microsoft.jpg' },
-    { id: '游戏本',       name: '游戏本',      iconImage: '/images/logos/gaming.png' },
-    { id: '移动工作站',   name: '移动工作站',  iconImage: '/images/logos/workstation.png' },
-    { id: '二合一',       name: '二合一',      iconImage: '/images/logos/other.png' },
-    { id: '其他',         name: '其他',        iconImage: '/images/logos/other.png' }
-  ]
-
   try {
     // 从 ERP 拉取所有商品，提取去重分类
     const res = await getProducts({ pageSize: 50 })
-    const erpCats = [...new Set(res.data.map(p => p.category).filter(Boolean))]
-
-    // 合并：保留本地预设，追加 ERP 独有分类
-    const localIds = new Set(LOCAL_CATEGORIES.map(c => c.id))
-    const merged = [...LOCAL_CATEGORIES]
-    erpCats.forEach(c => {
-      if (!localIds.has(c)) {
-        merged.push({ id: c, name: c, iconImage: '/images/logos/other.png' })
-      }
-    })
-    return { code: 0, data: merged }
+    const categories = [...new Set(res.data.map(p => p.category).filter(Boolean))]
+    const data = categories.map(c => ({ id: c, name: c, iconImage: '/images/logos/other.png' }))
+    return { code: 0, data }
   } catch (e) {
-    // ERP 不可用时回退本地分类
-    return { code: 0, data: LOCAL_CATEGORIES }
+    return { code: 0, data: [] }
   }
 }
 
@@ -364,18 +337,10 @@ async function getCategories() {
  * GET /api/v1/banners（无需认证）
  */
 async function getBanners() {
-  // 本地默认 Banner 兜底
-  const LOCAL_BANNERS = [
-    { id: 'b1', title: '🔥 热销爆款', desc: '甄选人气TOP · 销量口碑双冠', color: '#E74C3C', productId: '', imageUrl: '', sortOrder: 0 },
-    { id: 'b2', title: '🆕 最近上新', desc: '2024新款笔记本 · 抢先体验', color: '#2ECC71', productId: '', imageUrl: '', sortOrder: 1 },
-    { id: 'b3', title: '⚡ 限时特惠', desc: '精选好物直降 · 手慢无', color: '#F39C12', productId: '', imageUrl: '', sortOrder: 2 }
-  ]
-
   try {
     const res = await erpRequest('GET', '/api/v1/banners')
-    // ERP 返回数组
     const list = (Array.isArray(res) ? res : (res.data || res.items || []))
-    if (!list.length) return { code: 0, data: LOCAL_BANNERS }  // ERP 无数据时兜底
+    if (!list.length) return { code: 0, data: [] }
 
     // 按 sortOrder 升序排列
     list.sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0))
@@ -392,8 +357,7 @@ async function getBanners() {
     }))
     return { code: 0, data }
   } catch (e) {
-    // ERP 不可用时回退本地 Banner
-    return { code: 0, data: LOCAL_BANNERS }
+    return { code: 0, data: [] }
   }
 }
 

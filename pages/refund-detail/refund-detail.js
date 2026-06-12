@@ -54,7 +54,6 @@ Page({
         if (erp) {
           // ERP 售后状态映射
           const erpStatus = erp.afterSalesStatus || erp.status || ''
-          console.log('[退款详情] ERP 状态:', erpStatus, '本地状态:', refund.status)
 
           if (erpStatus === 'REFUNDED') {
             if (refund.status !== 'refunded') {

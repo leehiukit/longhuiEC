@@ -260,7 +260,6 @@ Page({
       erpOrderId = erpRes.id || ''
     } catch (e) {
       // ERP 下单失败：记录错误但不阻断本地流程，用户可稍后再支付
-      console.error('[下单] ERP 创建订单失败:', e.message || e)
       wx.showToast({
         title: e.message || '订单创建异常',
         icon: 'none',
@@ -344,14 +343,12 @@ Page({
         return wx.showToast({ title: '请先微信授权登录', icon: 'none' })
       }
       if (!this.currentOrderNo) {
-        console.warn('[支付] 未检测到 ERP 订单号，将使用本地 ID:', orderNo)
+        // 未检测到 ERP 订单号，将使用本地 ID 支付
       }
       if (totalFee <= 0) {
         this.setData({ paying: false })
         return wx.showToast({ title: '支付金额无效', icon: 'none' })
       }
-
-      console.log('[支付] 请求参数:', { orderNo, totalFee, openid: openid.slice(0, 8) + '...', body: itemNames })
 
       // ② 请求后端统一下单 → 获取支付参数
       wx.showLoading({ title: '拉起支付...', mask: true })
@@ -363,8 +360,6 @@ Page({
         attach: order.id
       })
       wx.hideLoading()
-
-      console.log('[支付] 统一下单返回:', JSON.stringify(payParams).slice(0, 200))
 
       // ③ 调起微信支付
       await API.requestPayment(payParams)
@@ -404,9 +399,6 @@ Page({
         wx.showToast({ title: '支付已取消', icon: 'none' })
         return
       }
-
-      console.error('[支付] 失败:', err)
-
       const errMsg = err.message || '支付遇到问题'
       wx.showModal({
         title: '支付失败',

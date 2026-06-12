@@ -116,10 +116,9 @@ Page({
     this.setData({ submitting: true })
     wx.showLoading({ title: '提交中...' })
 
-    setTimeout(() => {
-      wx.hideLoading()
+    wx.hideLoading()
 
-      const review = app.addReview({
+    const review = app.addReview({
         orderId: this.data.orderId,
         rating,
         content,
@@ -128,18 +127,17 @@ Page({
         images
       })
 
-      this.setData({ submitting: false })
+    this.setData({ submitting: false })
 
-      wx.showToast({
-        title: '评价成功',
-        icon: 'success',
-        duration: 1500,
-        complete: () => {
-          setTimeout(() => {
-            wx.navigateBack()
-          }, 1500)
-        }
-      })
-    }, 800)
+    wx.showToast({
+      title: '评价成功',
+      icon: 'success',
+      duration: 1500,
+      complete: () => {
+        setTimeout(() => {
+          wx.navigateBack()
+        }, 1500)
+      }
+    })
   }
 })

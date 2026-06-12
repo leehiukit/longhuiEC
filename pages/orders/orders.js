@@ -189,7 +189,6 @@ Page({
         isEmpty: orders.length === 0
       })
     } catch (e) {
-      console.error('[Orders] loadOrders error:', e)
       this.setData({ orders: [], isEmpty: true })
     }
   },
