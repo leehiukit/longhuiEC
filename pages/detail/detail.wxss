@@ -117,23 +117,36 @@
 }
 .spec-value { flex: 1; color: #444; font-size: 26rpx; }
 
-/* 服务保障 */
+/* 服务保障 - 图片卡 */
 .guarantee-grid {
   display: flex;
   flex-wrap: wrap;
   gap: 16rpx;
 }
-.guarantee-item {
+.guarantee-card {
   width: calc(50% - 8rpx);
   display: flex;
+  flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: 12rpx;
-  background: #fefaf3;
-  padding: 20rpx;
-  border-radius: 12rpx;
+  background: linear-gradient(135deg, #fffbf0, #fff);
+  padding: 28rpx 16rpx 22rpx;
+  border-radius: 16rpx;
+  border: 1rpx solid #f5e6c8;
+  box-shadow: 0 2rpx 12rpx rgba(232,149,42,0.08);
+  box-sizing: border-box;
 }
-.g-icon { font-size: 32rpx; }
-.g-text { font-size: 25rpx; color: #666; }
+.g-img {
+  width: 48rpx;
+  height: 48rpx;
+}
+.g-text {
+  font-size: 24rpx;
+  color: #555;
+  text-align: center;
+  line-height: 1.4;
+}
 
 /* 描述 */
 .desc-content {

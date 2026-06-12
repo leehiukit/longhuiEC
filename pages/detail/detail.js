@@ -8,12 +8,12 @@ Page({
     product: null,
     specList: [],
     guarantees: [
-      { icon: '🛡️', text: '365天超长质保' },
-      { icon: '✅', text: '正品保障 · 支持验机' },
-      { icon: '🚚', text: '24小时极速发货' },
-      { icon: '🔄', text: '7天无理由退换' },
-      { icon: '🧹', text: '深度清洁杀菌消毒' },
-      { icon: '💬', text: '终身免费技术咨询' }
+      { icon: '/images/guarantees/warranty.png', text: '365天超长质保' },
+      { icon: '/images/guarantees/authentic.png', text: '正品保障 · 支持验机' },
+      { icon: '/images/guarantees/shipping.png', text: '24小时极速发货' },
+      { icon: '/images/guarantees/return.png', text: '7天无理由退换' },
+      { icon: '/images/guarantees/clean.png', text: '深度清洁杀菌消毒' },
+      { icon: '/images/guarantees/support.png', text: '终身免费技术咨询' }
     ],
     isFav: false,
     cartCount: 0

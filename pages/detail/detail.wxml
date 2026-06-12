@@ -52,8 +52,8 @@
   <view class="section guarantee-section">
     <view class="section-header"><text>有闲保障</text></view>
     <view class="guarantee-grid">
-      <view class="guarantee-item" wx:for="{{guarantees}}" wx:key="*this">
-        <text class="g-icon">{{item.icon}}</text>
+      <view class="guarantee-card" wx:for="{{guarantees}}" wx:key="text">
+        <image class="g-img" src="{{item.icon}}" mode="aspectFit" />
         <text class="g-text">{{item.text}}</text>
       </view>
     </view>
