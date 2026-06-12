@@ -93,7 +93,10 @@ Authorization: Bearer <token>
 
 手机号一键登录（利用微信手机号组件，无需短信验证码）。
 
-`<button open-type="getPhoneNumber">` 回调拿到 code 后调用，后端解密手机号 → 获取 openid → 查/建 User → 签发 JWT，一步完成。
+> **前端已不再使用此接口。** 统一改为 `wx-login`（拿 openid）+ `phone`（解密手机号）两步。
+> 后端可保留此接口作为快捷通道，但不是必须。
+
+`<button open-type="getPhoneNumber">` 回调拿到 code 后调用，后端解密手机号 → 查/建 User → 签发 JWT。
 
 **Headers:**
 ```
@@ -104,30 +107,20 @@ Content-Type: application/json
 | 字段 | 类型 | 必填 | 说明 |
 |------|------|:----:|------|
 | code | string | ✅ | `getPhoneNumber` 回调的 `e.detail.code` |
-| wxCode | string | ❌ | `wx.login()` 返回的临时 code（传入后后端自动调用 code2Session 获取 openid，用于微信支付） |
 
 **Response:**
 ```json
 {
   "token": "eyJhbGciOiJIUzI1NiIs...",
   "phone": "1381234****",
-  "openid": "oGZUI0eg********",
   "user": {
     "id": "cmotmhlu50006p7utol2ncig1",
     "name": "张三",
     "phone": "1381234****",
-    "openid": "oGZUI0eg********",
     "role": "CUSTOMER"
   }
 }
 ```
-
-| 字段 | 类型 | 说明 |
-|------|------|------|
-| token | string | 用户登录 JWT |
-| phone | string | 手机号 |
-| openid | string | 微信 openid（仅传入 wxCode 时有值，用于微信支付 payer.openid） |
-| user | object | 用户信息 |
 
 > `phone-login` 与 `wx-login` 签发的 JWT 等效，之后所有需鉴权接口均可正常使用。
 

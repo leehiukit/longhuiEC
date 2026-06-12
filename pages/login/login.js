@@ -171,9 +171,9 @@ Page({
   /* ==================== 微信一键登录 ==================== */
 
   /**
-   * 微信一键登录（getPhoneNumber 回调）— 一次 API 调用完成
-   * 流程：点按钮 → 微信授权弹窗 → 获取 code →
-   *       wx.login() 拿 wxCode → phoneLogin(code, wxCode) → 后端一并返回 token + phone + openid
+   * 微信一键登录（getPhoneNumber 回调）
+   * 流程：① wxLogin() 拿 token+openid → ② phone API 解密手机号 → 完成登录
+   * 核心原则：openid 只依赖 wx.login()，手机号只是额外绑定
    */
   async onGetPhone(e) {
     if (e.detail.errMsg && e.detail.errMsg.includes('fail')) {
@@ -188,43 +188,33 @@ Page({
     wx.showLoading({ title: '微信授权中...', mask: true })
 
     try {
-      // ① 先获取 wx.login 的 code（用于后端换取 openid）
-      let wxCode = ''
-      try {
-        const wxLoginResult = await new Promise((resolve, reject) => {
-          wx.login({ success: resolve, fail: reject })
-        })
-        wxCode = wxLoginResult.code || ''
-      } catch (_) { /* wx.login 不可用不影响主流程 */ }
-
-      // ② 一次请求：后端解密手机号 + 获取 openid + 签发 JWT
-      const loginResult = await API.phoneLogin(e.detail.code, wxCode)
-      const phone = loginResult.phone
-      const token = loginResult.token
+      // ① 先拿身份：wx.login → 后端 code2Session → token + openid
+      const loginResult = await API.wxLogin()
       const openid = loginResult.openid || ''
 
-      if (!phone || !token) {
-        throw new Error('后端未返回手机号或 token')
+      // ② 再解密手机号：用 step① 的 token 鉴权
+      const { phoneNumber: phone } = await API.getPhoneNumber(e)
+
+      if (!phone) {
+        throw new Error('未获取到手机号')
       }
 
-      // ③ 构建用户信息（优先使用后端返回的 user）
+      // ③ 构建用户信息
       const existingUser = this.getExistingUser(phone)
-      const backendUser = loginResult.user || {}
       const userInfo = existingUser
-        ? { ...existingUser, ...backendUser, openid: openid || existingUser.openid || '', lastLogin: new Date().toISOString() }
+        ? { ...existingUser, openid, lastLogin: new Date().toISOString() }
         : {
-            id: backendUser.id || ('U' + Date.now().toString(36).toUpperCase()),
-            nickName: backendUser.name || `甄选会员${phone.slice(-4)}`,
+            id: 'U' + Date.now().toString(36).toUpperCase(),
+            nickName: `甄选会员${phone.slice(-4)}`,
             avatarUrl: '',
             phone,
             openid,
             level: 1,
-            registerTime: new Date().toISOString(),
-            ...backendUser
+            registerTime: new Date().toISOString()
           }
 
       // ④ 写入 token + user
-      wx.setStorageSync(TOKEN_KEY, { token, openid, phone, createdAt: Date.now(), expiresAt: Date.now() + TOKEN_EXPIRE_DAYS * 24 * 60 * 60 * 1000 })
+      wx.setStorageSync(TOKEN_KEY, { token: loginResult.token, openid, phone, createdAt: Date.now(), expiresAt: Date.now() + TOKEN_EXPIRE_DAYS * 24 * 60 * 60 * 1000 })
       wx.setStorageSync(USER_KEY, userInfo)
 
       app.globalData.isLoggedIn = true
