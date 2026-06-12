@@ -154,6 +154,32 @@ function getPhoneNumber(e) {
 }
 
 /**
+ * 本机号码一键登录（微信）
+ * POST /api/v1/auth/phone-login
+ *
+ * 前端通过 <button open-type="getPhoneNumber"> 拿到 code 后调用此接口，
+ * 后端解密手机号 → 查/建 User → 签发 JWT，无需短信验证码。
+ *
+ * Body: { code: "getPhoneNumber 返回的 code" }
+ * Response: { token, phone, user: { id, name, phone, role } }
+ */
+function phoneLogin(code) {
+  return new Promise((resolve, reject) => {
+    erpRequest('POST', '/api/v1/auth/phone-login', { code }, { useUser: false })
+      .then(res => {
+        if (!res.token) return reject(new Error('后端未返回 token'))
+        resolve({
+          token: res.token,
+          phone: res.phone || '',
+          openid: res.openid || res.user?.openid || '',
+          user: res.user || {}
+        })
+      })
+      .catch(err => reject(new Error('一键登录失败: ' + (err.message || '未知错误'))))
+  })
+}
+
+/**
  * 获取用户头像/昵称（从本地缓存读取，由微信侧提供）
  */
 function getUserProfile() {
@@ -566,6 +592,7 @@ module.exports = {
   adminLogin,
   getMe,
   getPhoneNumber,
+  phoneLogin,
   getUserProfile,
   unifiedOrder,
   requestPayment,

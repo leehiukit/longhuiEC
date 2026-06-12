@@ -51,43 +51,19 @@
 
 /* 表单 */
 .login-form { padding: 0 52rpx; }
-.form-item {
-  background: #fff;
-  border-radius: 12rpx;
-  padding: 26rpx 20rpx;
-  margin-bottom: 16rpx;
-  display: flex;
-  align-items: center;
-  gap: 14rpx;
-  box-shadow: 0 1rpx 6rpx rgba(0,0,0,0.04);
-}
-.form-icon { font-size: 32rpx; flex-shrink: 0; }
-.form-input { height: 48rpx; font-size: 30rpx; flex: 1; color: #333; }
-.code-row { justify-content: space-between; }
-.code-input { flex: 1; min-width: 0; }
-.code-btn {
-  font-size: 24rpx;
-  color: #E8952A;
-  background: transparent;
-  border: none;
-  line-height: normal;
-  padding: 10rpx 20rpx;
-  height: auto;
-  white-space: nowrap;
-  flex-shrink: 0;
-  display: flex;
+
+/* 本机号码一键登录 */
+.phone-login-intro { text-align: center; margin-bottom: 28rpx; }
+.intro-text { font-size: 24rpx; color: #aaa; }
+.btn-phone-login {
+  width: 100%;
+  display: flex !important;
+  flex-direction: row;
   align-items: center;
   justify-content: center;
-  box-sizing: border-box;
-}
-.code-btn::after { display: none; }
-.code-btn.disabled { color: #ccc; }
-
-/* 登录按钮 */
-.btn-login {
-  margin-top: 56rpx;
-  width: 100%;
+  gap: 14rpx;
   height: 94rpx;
+  line-height: 94rpx;
   background: linear-gradient(135deg, #E8952A, #F5C066);
   color: #fff;
   font-size: 34rpx;
@@ -95,19 +71,19 @@
   border-radius: 47rpx;
   border: none;
   box-shadow: 0 8rpx 28rpx rgba(232,149,42,0.35);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
+  letter-spacing: 4rpx;
+  padding-left: 10rpx;
+  padding-right: 10rpx;
   box-sizing: border-box;
-  line-height: 1;
+  overflow: hidden;
 }
-.btn-login::after { display: none; }
-.btn-login[disabled] {
-  opacity: 0.45;
-  box-shadow: none;
-  background: linear-gradient(135deg, #e8c9a0, #f0d9b0);
+.btn-phone-login::after { display: none; }
+.btn-phone-login text {
+  white-space: nowrap;
+  line-height: 1.2;
 }
+.btn-phone-icon { font-size: 36rpx; }
+.btn-phone-login.disabled { opacity: 0.6; pointer-events: none; }
 
 .login-tips {
   text-align: center;
