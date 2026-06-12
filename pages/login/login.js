@@ -25,7 +25,9 @@ Page({
 
   /**
    * 本机号码一键登录（getPhoneNumber 回调）
-   * 流程：getPhoneNumber code → POST /api/v1/auth/phone-login → token+phone+user → 完成登录
+   * 流程：
+   *   ① phoneLogin(code) → token+phone → 完成登录
+   *   ② wx.login() + wx-login API → openid（独立获取，确保支付时可带上）
    */
   async onPhoneLogin(e) {
     if (e.detail.errMsg && e.detail.errMsg.includes('fail')) {
@@ -40,12 +42,24 @@ Page({
     wx.showLoading({ title: '号码认证中...', mask: true })
 
     try {
+      // ① 本机号码一键登录
       const result = await API.phoneLogin(e.detail.code)
       const phone = result.phone
-      const openid = result.openid
 
       if (!phone) {
         throw new Error('未获取到手机号')
+      }
+
+      // ② 独立调用 wx.login() 获取 openid（无论用什么登录方式都拿得到）
+      let openid = result.openid || ''
+      if (!openid) {
+        try {
+          const wxResult = await API.wxLogin()
+          openid = wxResult.openid || ''
+        } catch (_) {
+          // wx-login 失败不阻断登录，支付时后端可自动查 openid
+          console.warn('[登录] wx-login 获取 openid 失败，支付时将由后端自动查询')
+        }
       }
 
       // 构建用户信息
