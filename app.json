@@ -62,13 +62,5 @@
   "componentFramework": "glass-easel",
   "sitemapLocation": "sitemap.json",
   "lazyCodeLoading": "requiredComponents",
-  "__usePrivacyCheck__": true,
-  "requiredPrivateInfos": [
-    "getPhoneNumber"
-  ],
-  "permission": {
-    "scope.userLocation": {
-      "desc": "用于获取大致位置以提供收货地址建议"
-    }
-  }
+  "__usePrivacyCheck__": true
 }
