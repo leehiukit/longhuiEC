@@ -18,6 +18,20 @@ Page({
     if (app.globalData.isLoggedIn) {
       const pages = getCurrentPages()
       pages.length >= 2 ? wx.navigateBack() : wx.switchTab({ url: '/pages/user/user' })
+      return
+    }
+    // ★ 主动触发微信隐私授权弹窗，确保 getPhoneNumber 不被拦截
+    this.requirePrivacy()
+  },
+
+  // 主动请求隐私授权（兼容基础库 2.32.3+）
+  requirePrivacy() {
+    if (typeof wx.requirePrivacyAuthorize === 'function') {
+      wx.requirePrivacyAuthorize({
+        success: () => { /* 用户已同意隐私协议 */ },
+        fail: () => { /* 用户拒绝，按钮仍然可用但 API 调用会被拦截 */ },
+        complete: () => { /* 不做额外处理 */ }
+      })
     }
   },
 
@@ -159,7 +173,8 @@ Page({
     } catch (err) {
       wx.hideLoading()
       this.setData({ phoneLogging: false })
-      wx.showToast({ title: err.message || '登录失败，请重试', icon: 'none' })
+      const msg = err.message || '登录失败'
+      wx.showToast({ title: msg.length > 20 ? msg.slice(0, 20) + '...' : msg, icon: 'none', duration: 2500 })
     }
   },
 
@@ -167,7 +182,7 @@ Page({
 
   /**
    * 微信一键登录（getPhoneNumber 回调）
-   * 流程：① wxLogin() 拿 token+openid → ② phone API 解密手机号 → 完成登录
+   * 流程：① wxLogin() 拿 token+openid → ② 暂存 token → ③ phone API 解密手机号 → 完成登录
    */
   async onGetPhone(e) {
     if (e.detail.errMsg && e.detail.errMsg.includes('fail')) {
@@ -182,10 +197,34 @@ Page({
     wx.showLoading({ title: '微信授权中...', mask: true })
 
     try {
+      // ① wx.login → 换取 openid + token
       const loginResult = await API.wxLogin()
       const openid = loginResult.openid || ''
+      const wxToken = loginResult.token
 
-      const { phoneNumber: phone } = await API.getPhoneNumber(e)
+      if (!wxToken) {
+        throw new Error('微信登录未返回 token')
+      }
+
+      // ★ ② 关键修复：立即把 token 写入 storage（getPhoneNumber 需要用这个 token 鉴权）
+      wx.setStorageSync(TOKEN_KEY, {
+        token: wxToken,
+        openid,
+        createdAt: Date.now(),
+        expiresAt: Date.now() + TOKEN_EXPIRE_DAYS * 24 * 60 * 60 * 1000
+      })
+
+      // ③ 用暂存的 token 鉴权解密手机号
+      let phone = ''
+      try {
+        const phoneResult = await API.getPhoneNumber(e)
+        phone = phoneResult.phoneNumber || ''
+      } finally {
+        // ★ 如果解密失败，清除已暂存的 token，避免脏数据
+        if (!phone) {
+          wx.removeStorageSync(TOKEN_KEY)
+        }
+      }
 
       if (!phone) {
         throw new Error('未获取到手机号')
@@ -204,8 +243,9 @@ Page({
             registerTime: new Date().toISOString()
           }
 
+      // 更新 token 信息（补充 phone）
       wx.setStorageSync(TOKEN_KEY, {
-        token: loginResult.token, openid, phone,
+        token: wxToken, openid, phone,
         createdAt: Date.now(),
         expiresAt: Date.now() + TOKEN_EXPIRE_DAYS * 24 * 60 * 60 * 1000
       })
@@ -233,6 +273,8 @@ Page({
     } catch (err) {
       wx.hideLoading()
       this.setData({ wechatLogging: false })
+      // ★ 确保错误时清除 token
+      wx.removeStorageSync(TOKEN_KEY)
       wx.showToast({ title: err.message || '微信登录失败', icon: 'none' })
     }
   },

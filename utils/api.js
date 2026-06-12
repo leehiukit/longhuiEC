@@ -143,13 +143,16 @@ function getPhoneNumber(e) {
     const code = e.detail.code
     if (!code) return reject(new Error('未获取到手机号授权码'))
 
-    // 将 code 发送到 ERP 后端解密（需用户 token）
+    // 将 code 发送到 ERP 后端解密（需 Bearer token 鉴权）
     userRequest('POST', '/api/v1/auth/phone', { code })
       .then(res => {
         if (!res.phoneNumber) return reject(new Error('后端未返回手机号'))
         resolve({ phoneNumber: res.phoneNumber })
       })
-      .catch(err => reject(new Error('手机号获取失败: ' + (err.message || '未知错误'))))
+      .catch(err => {
+        // ★ 透传详细错误信息用于调试
+        reject(new Error('手机号解密失败: ' + (err.message || '未知错误')))
+      })
   })
 }
 
@@ -175,7 +178,10 @@ function phoneLogin(code) {
           user: res.user || {}
         })
       })
-      .catch(err => reject(new Error('一键登录失败: ' + (err.message || '未知错误'))))
+      .catch(err => {
+        // ★ 透传真实错误
+        reject(new Error('一键登录失败: ' + (err.message || '未知错误')))
+      })
   })
 }
 
