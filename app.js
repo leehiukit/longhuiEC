@@ -19,6 +19,7 @@ App({
     this.migrateStorageKeys()
     this.checkLoginStatus()
     this.initCart()
+  },
 
   // Storage Key 迁移（兼容旧版本数据）
   migrateStorageKeys() {
