@@ -10,7 +10,7 @@ Page({
     guarantees: [
       { icon: '🛡️', text: '365天超长质保' },
       { icon: '✅', text: '正品保障 · 支持验机' },
-      { icon: '🚚', text: '72小时极速发货' },
+      { icon: '🚚', text: '24小时极速发货' },
       { icon: '🔄', text: '7天无理由退换' },
       { icon: '🧹', text: '深度清洁杀菌消毒' },
       { icon: '💬', text: '终身免费技术咨询' }
