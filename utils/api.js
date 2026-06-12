@@ -5,7 +5,7 @@
 const CONFIG = {
   BASE_URL: 'https://erp.qixiangshou.com',
   APP_ID: 'wx8cf5c2ef49e867fe',
-  MCH_ID: '1641058332',
+  MCH_ID: '1746811683',
   ERP_TOKEN_KEY: 'yxzx_erp_token',   // ERP 管理员 JWT（用于 API 鉴权）
   USER_TOKEN_KEY: 'yxzx_token'        // 用户微信登录信息
 }
@@ -212,7 +212,7 @@ function getStoredProfile() {
  *    Header: Authorization: WECHATPAY2-SHA256-RSA2048 ...
  *    Body: {
  *      appid: "wx8cf5c2ef49e867fe",
- *      mchid: "1641058332",
+ *      mchid: "1746811683",
  *      description: body,
  *      out_trade_no: orderNo,
  *      notify_url: "https://erp.qixiangshou.com/api/v1/payment/notify",
