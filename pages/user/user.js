@@ -13,6 +13,7 @@ Page({
       { icon: '🚚', label: '待收货', status: 'shipped', count: 0 },
       { icon: '⭐', label: '待评价', status: 'received', count: 0 }
     ],
+    needBindWechat: false,
     menus: [
       { icon: '❤️', label: '我的收藏', desc: '', url: '/pages/favorites/favorites', color: '#E8952A' },
       { icon: '📍', label: '收货地址', desc: '', url: '/pages/address/address', color: '#52c41a' },
@@ -27,10 +28,11 @@ Page({
   },
 
   checkLogin() {
-    this.setData({
-      isLoggedIn: app.globalData.isLoggedIn,
-      userInfo: app.globalData.userInfo || {}
-    })
+    const isLoggedIn = app.globalData.isLoggedIn
+    const userInfo = app.globalData.userInfo || {}
+    // 已登录但没有 openid → 需要绑定微信
+    const needBindWechat = isLoggedIn && !app.globalData.openid
+    this.setData({ isLoggedIn, userInfo, needBindWechat })
   },
 
   // 从本地订单实时计算统计数据
@@ -109,6 +111,37 @@ Page({
     }
     if (url && url.startsWith('/pages/')) {
       wx.navigateTo({ url })
+    }
+  },
+
+  /** 绑定微信：调 wx.login + wx-login API 获取 openid 并持久化 */
+  async bindWechat() {
+    wx.showLoading({ title: '绑定中...', mask: true })
+    try {
+      const wxResult = await API.wxLogin()
+      const openid = wxResult.openid || ''
+      if (!openid) throw new Error('未获取到微信 openid')
+
+      // 持久化 openid
+      const tokenData = wx.getStorageSync('yxzx_token') || {}
+      tokenData.openid = openid
+      wx.setStorageSync('yxzx_token', tokenData)
+
+      const user = wx.getStorageSync('yxzx_user') || {}
+      user.openid = openid
+      wx.setStorageSync('yxzx_user', user)
+
+      app.globalData.openid = openid
+      if (app.globalData.userInfo) {
+        app.globalData.userInfo.openid = openid
+      }
+
+      this.setData({ needBindWechat: false, userInfo: { ...(this.data.userInfo), openid } })
+      wx.hideLoading()
+      wx.showToast({ title: '微信绑定成功', icon: 'success' })
+    } catch (err) {
+      wx.hideLoading()
+      wx.showToast({ title: err.message || '绑定失败，请重试', icon: 'none' })
     }
   },
 

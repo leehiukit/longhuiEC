@@ -94,17 +94,69 @@ Page({
       this.saveUserRecord(phone, userInfo)
 
       wx.hideLoading()
+      this.setData({ phoneLogging: false })
+
+      const needBindWechat = !openid
+
       wx.showToast({
         title: existingUser ? '欢迎回来' : '欢迎来到有闲甄选',
-        icon: 'success', duration: 1500,
+        icon: 'success', duration: 1200,
         complete: () => {
-          setTimeout(() => {
+          const navigate = () => {
             const pages = getCurrentPages()
             pages.length >= 2 ? wx.navigateBack() : wx.switchTab({ url: '/pages/user/user' })
-          }, 1500)
+          }
+
+          if (needBindWechat) {
+            // 手机号登录后 openid 为空 → 推荐绑定微信
+            setTimeout(() => {
+              wx.showModal({
+                title: '绑定微信',
+                content: '检测到您使用手机号登录，建议绑定微信以获得更完整的服务体验（支付、订单通知等）',
+                confirmText: '去绑定',
+                cancelText: '稍后再说',
+                success: async (res) => {
+                  if (res.confirm) {
+                    wx.showLoading({ title: '绑定中...', mask: true })
+                    try {
+                      const wxResult = await API.wxLogin()
+                      const wechatOpenid = wxResult.openid || ''
+                      if (wechatOpenid) {
+                        const tokenData = wx.getStorageSync(TOKEN_KEY) || {}
+                        tokenData.openid = wechatOpenid
+                        wx.setStorageSync(TOKEN_KEY, tokenData)
+
+                        const user = wx.getStorageSync(USER_KEY) || {}
+                        user.openid = wechatOpenid
+                        wx.setStorageSync(USER_KEY, user)
+
+                        app.globalData.openid = wechatOpenid
+                        app.globalData.userInfo = { ...(app.globalData.userInfo || {}), openid: wechatOpenid }
+
+                        wx.hideLoading()
+                        wx.showToast({ title: '微信绑定成功', icon: 'success', duration: 1500 })
+                        setTimeout(navigate, 1500)
+                      } else {
+                        wx.hideLoading()
+                        wx.showToast({ title: '绑定失败，可在个人中心重试', icon: 'none', duration: 2000 })
+                        setTimeout(navigate, 2000)
+                      }
+                    } catch (_) {
+                      wx.hideLoading()
+                      wx.showToast({ title: '绑定失败，可在个人中心重试', icon: 'none', duration: 2000 })
+                      setTimeout(navigate, 2000)
+                    }
+                  } else {
+                    navigate()
+                  }
+                }
+              })
+            }, 300)
+          } else {
+            setTimeout(navigate, 500)
+          }
         }
       })
-      this.setData({ phoneLogging: false })
     } catch (err) {
       wx.hideLoading()
       this.setData({ phoneLogging: false })

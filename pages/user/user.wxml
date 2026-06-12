@@ -33,6 +33,16 @@
     </view>
   </view>
 
+  <!-- 微信绑定引导（仅手机号登录用户可见） -->
+  <view class="bind-wechat-banner" wx:if="{{needBindWechat}}" bindtap="bindWechat">
+    <view class="bind-icon">🔗</view>
+    <view class="bind-text">
+      <text class="bind-title">绑定微信账号</text>
+      <text class="bind-desc">绑定后可使用微信支付、接收订单通知</text>
+    </view>
+    <view class="bind-arrow">去绑定 ›</view>
+  </view>
+
   <!-- 统计数据 -->
   <view class="stats-card">
     <view class="stat-item" bindtap="goOrders" data-status="">
