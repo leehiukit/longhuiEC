@@ -117,21 +117,20 @@
 }
 .spec-value { flex: 1; color: #444; font-size: 26rpx; }
 
-/* 服务保障 - 图片卡 */
+/* 服务保障 - 横向图片卡 */
 .guarantee-grid {
   display: flex;
-  flex-wrap: wrap;
-  gap: 16rpx;
+  flex-direction: column;
+  gap: 14rpx;
 }
 .guarantee-card {
-  width: calc(50% - 8rpx);
+  width: 100%;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
-  justify-content: center;
-  gap: 12rpx;
+  gap: 20rpx;
   background: linear-gradient(135deg, #fffbf0, #fff);
-  padding: 28rpx 16rpx 22rpx;
+  padding: 24rpx 28rpx;
   border-radius: 16rpx;
   border: 1rpx solid #f5e6c8;
   box-shadow: 0 2rpx 12rpx rgba(232,149,42,0.08);
@@ -140,11 +139,11 @@
 .g-img {
   width: 48rpx;
   height: 48rpx;
+  flex-shrink: 0;
 }
 .g-text {
-  font-size: 24rpx;
+  font-size: 26rpx;
   color: #555;
-  text-align: center;
   line-height: 1.4;
 }
 
