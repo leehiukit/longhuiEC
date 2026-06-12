@@ -37,6 +37,7 @@
         <text class="stat-label">全网好评率</text>
       </view>
     </view>
+  </view>
 
   <!-- 轮播图 -->
   <swiper class="banner" indicator-dots indicator-color="rgba(255,255,255,0.5)" indicator-active-color="#fff" autoplay circular>
