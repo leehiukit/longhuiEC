@@ -321,11 +321,33 @@ function searchProducts(keyword) {
  * 本地预设分类 + ERP 商品动态分类合并
  */
 async function getCategories() {
+  // 品牌分类与对应图标（真实配置）
+  const CATEGORY_ICONS = {
+    'Apple':      '/images/logos/apple.png',
+    'ThinkPad':    '/images/logos/thinkpad.jpg',
+    '华为':        '/images/logos/huawei.jpg',
+    '联想':        '/images/logos/lenovo.jpg',
+    '华硕':        '/images/logos/asus.png',
+    '惠普':        '/images/logos/hp.jpeg',
+    '戴尔':        '/images/logos/dell.png',
+    '微软':        '/images/logos/microsoft.jpg',
+    '游戏本':      '/images/logos/gaming.png',
+    '移动工作站':  '/images/logos/workstation.png',
+    '二合一':      '/images/logos/other.png',
+    '其他':        '/images/logos/other.png'
+  }
+
   try {
     // 从 ERP 拉取所有商品，提取去重分类
     const res = await getProducts({ pageSize: 50 })
-    const categories = [...new Set(res.data.map(p => p.category).filter(Boolean))]
-    const data = categories.map(c => ({ id: c, name: c, iconImage: '/images/logos/other.png' }))
+    const erpCats = [...new Set(res.data.map(p => p.category).filter(Boolean))]
+
+    // 已配置的用对应图标，ERP 新增分类用默认图标
+    const data = erpCats.map(c => ({
+      id: c,
+      name: c,
+      iconImage: CATEGORY_ICONS[c] || '/images/logos/other.png'
+    }))
     return { code: 0, data }
   } catch (e) {
     return { code: 0, data: [] }
