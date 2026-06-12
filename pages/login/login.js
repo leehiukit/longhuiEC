@@ -171,11 +171,9 @@ Page({
   /* ==================== 微信一键登录 ==================== */
 
   /**
-   * 微信一键登录（getPhoneNumber 回调）
+   * 微信一键登录（getPhoneNumber 回调）— 一次 API 调用完成
    * 流程：点按钮 → 微信授权弹窗 → 获取 code →
-   *       ① phoneLogin(code) → 后端解密手机号 + 签发 JWT
-   *       ② wxLogin() → 获取 openid（支付必须）
-   * 完成后写入 token / user / openid
+   *       wx.login() 拿 wxCode → phoneLogin(code, wxCode) → 后端一并返回 token + phone + openid
    */
   async onGetPhone(e) {
     if (e.detail.errMsg && e.detail.errMsg.includes('fail')) {
@@ -190,23 +188,23 @@ Page({
     wx.showLoading({ title: '微信授权中...', mask: true })
 
     try {
-      // ① phone-login：后端解密手机号 + 签发 JWT
-      const loginResult = await API.phoneLogin(e.detail.code)
+      // ① 先获取 wx.login 的 code（用于后端换取 openid）
+      let wxCode = ''
+      try {
+        const wxLoginResult = await new Promise((resolve, reject) => {
+          wx.login({ success: resolve, fail: reject })
+        })
+        wxCode = wxLoginResult.code || ''
+      } catch (_) { /* wx.login 不可用不影响主流程 */ }
+
+      // ② 一次请求：后端解密手机号 + 获取 openid + 签发 JWT
+      const loginResult = await API.phoneLogin(e.detail.code, wxCode)
       const phone = loginResult.phone
       const token = loginResult.token
+      const openid = loginResult.openid || ''
 
       if (!phone || !token) {
         throw new Error('后端未返回手机号或 token')
-      }
-
-      // ② 补充获取 openid（微信支付依赖 openid）
-      let openid = ''
-      try {
-        const wxLoginRes = await API.wxLogin()
-        openid = wxLoginRes.openid || ''
-      } catch (_) {
-        // openid 获取失败不阻断登录，但支付时会提示重新授权
-        console.warn('[Login] 获取 openid 失败，支付功能将不可用')
       }
 
       // ③ 构建用户信息（优先使用后端返回的 user）
@@ -225,25 +223,15 @@ Page({
             ...backendUser
           }
 
-      // ④ 写入 token（含 openid）
-      const tokenData = {
-        token,
-        openid,
-        phone,
-        createdAt: Date.now(),
-        expiresAt: Date.now() + TOKEN_EXPIRE_DAYS * 24 * 60 * 60 * 1000
-      }
-
-      wx.setStorageSync(TOKEN_KEY, tokenData)
+      // ④ 写入 token + user
+      wx.setStorageSync(TOKEN_KEY, { token, openid, phone, createdAt: Date.now(), expiresAt: Date.now() + TOKEN_EXPIRE_DAYS * 24 * 60 * 60 * 1000 })
       wx.setStorageSync(USER_KEY, userInfo)
 
       app.globalData.isLoggedIn = true
       app.globalData.userInfo = userInfo
       app.globalData.openid = openid
 
-      // 按账号隔离数据
       app.onLoginSuccess(phone)
-
       this.saveUserRecord(phone, userInfo)
 
       wx.hideLoading()
@@ -261,7 +249,6 @@ Page({
     } catch (err) {
       wx.hideLoading()
       this.setData({ wechatLogging: false })
-      // console.error('[Login] 微信登录失败:', err)
       wx.showToast({ title: err.message || '微信登录失败', icon: 'none' })
     }
   },

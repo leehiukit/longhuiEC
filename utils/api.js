@@ -120,17 +120,21 @@ function wxLogin() {
 }
 
 /**
- * 手机号一键登录（推荐）：利用微信 getPhoneNumber 组件返回的 code，
- * 后端自动解密手机号 → 查/建用户 → 签发 JWT，一步完成。
+ * 手机号一键登录（推荐）：一次请求完成「解密手机号 + 获取 openid + 签发 JWT」
  *
  * 【后端接口规范】
  * POST /api/v1/auth/phone-login
- * Body: { code: "getPhoneNumber 回调中 e.detail.code" }
+ * Body: {
+ *   code: "getPhoneNumber 回调中 e.detail.code",   // 必填
+ *   wxCode: "wx.login 返回的 code"                   // 可选，传了则后端自动获取 openid
+ * }
  *
- * Response: { token, phone, user: { id, name, phone, role } }
+ * Response: { token, phone, openid, user: { id, name, phone, openid, role } }
  */
-function phoneLogin(code) {
-  return erpRequest('POST', '/api/v1/auth/phone-login', { code })
+function phoneLogin(code, wxCode) {
+  const body = { code }
+  if (wxCode) body.wxCode = wxCode
+  return erpRequest('POST', '/api/v1/auth/phone-login', body)
 }
 
 /**
