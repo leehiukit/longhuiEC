@@ -9,7 +9,7 @@ const TOKEN_EXPIRE_DAYS = 7
 Page({
   data: {
     logoPath: app.globalData.logoPath || '',
-    agreed: true,
+    agreed: false,
     phoneLogging: false,    // 本机号码一键登录进行中
     wechatLogging: false    // 微信一键登录进行中
   },
