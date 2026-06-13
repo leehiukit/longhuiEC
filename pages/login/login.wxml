@@ -20,7 +20,7 @@
   <!-- 本机号码一键登录 -->
   <view class="login-form">
     <view class="phone-login-intro">
-      <text class="intro-text">无需短信验证码，授权本机号码即可登录</text>
+      <text class="intro-text">无需短信验证码，本机号码即可登录</text>
     </view>
     <button
       class="btn-phone-login {{phoneLogging ? 'disabled' : ''}}"
@@ -30,7 +30,7 @@
       loading="{{phoneLogging}}"
     >
       <text class="btn-phone-icon">📱</text>
-      <text>{{phoneLogging ? '登录中...' : '本机号码一键登录'}}</text>
+      <text>{{phoneLogging ? '登录中...' : '手机号快捷登录'}}</text>
     </button>
 
     <view class="login-tips">首次登录将自动注册账号</view>
@@ -47,7 +47,7 @@
       loading="{{wechatLogging}}"
     >
       <text class="wx-icon">📲</text>
-      <text>{{wechatLogging ? '登录中...' : '微信一键登录'}}</text>
+      <text>{{wechatLogging ? '登录中...' : '一键登录'}}</text>
     </button>
   </view>
 
