@@ -275,9 +275,7 @@ Page({
     wx.setStorageSync('yxzx_phone_users', records)
   },
 
-  onAgreeChange(e) {
-    // 点击链接时不触发 toggle（catchtap 已阻止冒泡，此处双重保险）
-    if (e.target !== e.currentTarget) return
+  onAgreeChange() {
     this.setData({ agreed: !this.data.agreed })
   },
 
