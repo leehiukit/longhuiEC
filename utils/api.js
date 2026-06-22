@@ -243,6 +243,7 @@ function unifiedOrder(orderData) {
     orderNo: orderData.orderId || orderData.orderNo || '',
     totalFee: orderData.totalFee,
     body: orderData.body || '有闲甄选商品',
+    description: orderData.description || orderData.body || '有闲甄选商品',
     openid: orderData.openid || '',
     attach: orderData.attach || ''
   })

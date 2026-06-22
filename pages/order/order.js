@@ -365,6 +365,7 @@ Page({
         orderNo,
         totalFee,
         body: itemNames || '有闲甄选商品',
+        description: itemNames || '有闲甄选二手数码商品',
         openid,
         attach: order.id
       })

@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>有闲甄选 — 公众号推文</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+      background: #f5f5f5;
+      color: #333;
+      line-height: 1.8;
+    }
+    .container {
+      max-width: 680px;
+      margin: 0 auto;
+      background: #fff;
+    }
+
+    /* 头图 */
+    .hero {
+      position: relative;
+      background: linear-gradient(135deg, #E8952A 0%, #D4821F 40%, #F5C066 100%);
+      padding: 60px 30px 50px;
+      text-align: center;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -50%; left: -50%;
+      width: 200%; height: 200%;
+      background: radial-gradient(circle at 30% 70%, rgba(255,255,255,.08) 0%, transparent 60%),
+                  radial-gradient(circle at 70% 30%, rgba(255,255,255,.05) 0%, transparent 50%);
+    }
+    .hero * { position: relative; z-index: 1; }
+    .hero .brand {
+      font-size: 40px;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: 6px;
+      margin-bottom: 8px;
+    }
+    .hero .subtitle {
+      font-size: 16px;
+      color: rgba(255,255,255,.85);
+      letter-spacing: 3px;
+      margin-bottom: 20px;
+    }
+    .hero .slogan {
+      display: inline-block;
+      padding: 10px 30px;
+      background: rgba(255,255,255,.15);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,.25);
+      border-radius: 30px;
+      font-size: 15px;
+      color: #fff;
+      letter-spacing: 2px;
+    }
+
+    /* 痛点 */
+    .section {
+      padding: 40px 28px;
+    }
+    .section-title {
+      text-align: center;
+      font-size: 22px;
+      font-weight: 700;
+      color: #333;
+      margin-bottom: 28px;
+      position: relative;
+    }
+    .section-title::after {
+      content: '';
+      display: block;
+      width: 40px;
+      height: 3px;
+      background: #E8952A;
+      margin: 12px auto 0;
+      border-radius: 2px;
+    }
+    .pain-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+    .pain-card {
+      background: #fef6ec;
+      border-radius: 12px;
+      padding: 20px 16px;
+      text-align: center;
+    }
+    .pain-card .icon { font-size: 32px; margin-bottom: 8px; }
+    .pain-card .title { font-size: 15px; font-weight: 600; color: #D4821F; margin-bottom: 4px; }
+    .pain-card .desc { font-size: 13px; color: #999; }
+
+    /* 解决方案 */
+    .solution {
+      background: #faf8f5;
+    }
+    .feature-list { display: flex; flex-direction: column; gap: 16px; }
+    .feature-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      background: #fff;
+      border-radius: 12px;
+      padding: 18px;
+      box-shadow: 0 2px 8px rgba(0,0,0,.04);
+    }
+    .feature-item .num {
+      flex-shrink: 0;
+      width: 36px; height: 36px;
+      background: linear-gradient(135deg, #E8952A, #F5C066);
+      color: #fff;
+      font-size: 16px;
+      font-weight: 700;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .feature-item h4 { font-size: 16px; color: #333; margin-bottom: 4px; }
+    .feature-item p { font-size: 13px; color: #888; }
+
+    /* 流程 */
+    .flow {
+      display: flex;
+      justify-content: space-between;
+      text-align: center;
+      gap: 6px;
+    }
+    .flow-step {
+      flex: 1;
+      background: #fff;
+      border-radius: 12px;
+      padding: 16px 6px;
+      box-shadow: 0 2px 8px rgba(0,0,0,.04);
+    }
+    .flow-step .step-icon { font-size: 28px; margin-bottom: 6px; }
+    .flow-step .step-title { font-size: 13px; font-weight: 600; color: #333; }
+
+    /* 保障 */
+    .warranty-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+    .warranty-card {
+      text-align: center;
+      background: #fff;
+      border-radius: 12px;
+      padding: 20px 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,.04);
+    }
+    .warranty-card .w-icon { font-size: 30px; margin-bottom: 8px; }
+    .warranty-card .w-title { font-size: 13px; font-weight: 600; color: #333; }
+
+    /* CTA */
+    .cta {
+      background: linear-gradient(135deg, #E8952A, #D4821F);
+      text-align: center;
+      padding: 40px 28px;
+    }
+    .cta h3 {
+      font-size: 22px;
+      color: #fff;
+      margin-bottom: 8px;
+    }
+    .cta p {
+      font-size: 14px;
+      color: rgba(255,255,255,.8);
+      margin-bottom: 20px;
+    }
+    .cta .qrcode {
+      width: 160px;
+      height: 160px;
+      background: #fff;
+      border-radius: 12px;
+      margin: 0 auto 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      color: #999;
+      border: 2px dashed #E8952A;
+    }
+    .cta .search-tip {
+      font-size: 13px;
+      color: rgba(255,255,255,.7);
+    }
+
+    .footer {
+      text-align: center;
+      padding: 24px;
+      font-size: 12px;
+      color: #bbb;
+      background: #faf8f5;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <!-- 头图 -->
+  <div class="hero">
+    <div class="brand">有闲甄选</div>
+    <div class="subtitle">SELECTION IN IDLE</div>
+    <div class="slogan">品质好物 · 精心甄选</div>
+  </div>
+
+  <!-- 痛点 -->
+  <div class="section">
+    <div class="section-title">买二手笔记本，你最怕什么？</div>
+    <div class="pain-grid">
+      <div class="pain-card">
+        <div class="icon">😰</div>
+        <div class="title">货不对板</div>
+        <div class="desc">图片精美，到手一堆划痕</div>
+      </div>
+      <div class="pain-card">
+        <div class="icon">🔋</div>
+        <div class="title">电池虚标</div>
+        <div class="desc">号称续航8小时，实际2小时</div>
+      </div>
+      <div class="pain-card">
+        <div class="icon">🛠️</div>
+        <div class="title">暗病隐患</div>
+        <div class="desc">到手即坏，维修无门</div>
+      </div>
+      <div class="pain-card">
+        <div class="icon">🚫</div>
+        <div class="title">售后无保障</div>
+        <div class="desc">出了问题找不到人</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 解决方案 -->
+  <div class="section solution">
+    <div class="section-title">我们不一样</div>
+    <div class="feature-list">
+      <div class="feature-item">
+        <div class="num">1</div>
+        <div>
+          <h4>12道严苛检测工序</h4>
+          <p>屏幕触控、电池健康、摄像头成像、全端口连接、WiFi蓝牙、CPU/GPU压力测试……每一台都经过专业团队逐项实测</p>
+        </div>
+      </div>
+      <div class="feature-item">
+        <div class="num">2</div>
+        <div>
+          <h4>外观至多达 A+ 级标准</h4>
+          <p>专业成色评估，轻微使用痕迹，绝不拿垃圾充好货</p>
+        </div>
+      </div>
+      <div class="feature-item">
+        <div class="num">3</div>
+        <div>
+          <h4>365天超长质保</h4>
+          <p>市面上大多30天或90天，我们给足一年，用得安心</p>
+        </div>
+      </div>
+      <div class="feature-item">
+        <div class="num">4</div>
+        <div>
+          <h4>7天无理由退换</h4>
+          <p>不满意随时退，售后无忧，全程线上跟踪</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 品牌矩阵 -->
+  <div class="section">
+    <div class="section-title">严选品牌阵容</div>
+    <p style="text-align:center; color:#888; font-size:14px; margin-bottom:20px;">
+      Apple · ThinkPad · 华为 · 联想 · 华硕 · 惠普 · 戴尔 · 微软 · 游戏本 · 移动工作站 · 二合一
+    </p>
+  </div>
+
+  <!-- 下单流程 -->
+  <div class="section solution">
+    <div class="section-title">一键下单，极速到家</div>
+    <div class="flow">
+      <div class="flow-step">
+        <div class="step-icon">🔍</div>
+        <div class="step-title">挑选好物</div>
+      </div>
+      <div class="flow-step">
+        <div class="step-icon">🛒</div>
+        <div class="step-title">加入购物车</div>
+      </div>
+      <div class="flow-step">
+        <div class="step-icon">💳</div>
+        <div class="step-title">微信支付</div>
+      </div>
+      <div class="flow-step">
+        <div class="step-icon">📦</div>
+        <div class="step-title">24h极速发货</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 服务保障 -->
+  <div class="section">
+    <div class="section-title">六大服务承诺</div>
+    <div class="warranty-grid">
+      <div class="warranty-card">
+        <div class="w-icon">🛡️</div>
+        <div class="w-title">365天质保</div>
+      </div>
+      <div class="warranty-card">
+        <div class="w-icon">✅</div>
+        <div class="w-title">正品保障</div>
+      </div>
+      <div class="warranty-card">
+        <div class="w-icon">🚚</div>
+        <div class="w-title">24h极速发货</div>
+      </div>
+      <div class="warranty-card">
+        <div class="w-icon">↩️</div>
+        <div class="w-title">7天无理由退换</div>
+      </div>
+      <div class="warranty-card">
+        <div class="w-icon">🧹</div>
+        <div class="w-title">深度清洁消毒</div>
+      </div>
+      <div class="warranty-card">
+        <div class="w-icon">💬</div>
+        <div class="w-title">终身技术咨询</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 用户证言 -->
+  <div class="section solution">
+    <div class="section-title">他们都在用</div>
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <div style="background:#fff;border-radius:12px;padding:18px;box-shadow:0 2px 8px rgba(0,0,0,.04);">
+        <div style="color:#E8952A;font-size:14px;margin-bottom:4px;">★★★★★</div>
+        <p style="font-size:14px;color:#555;">"ThinkPad X1 Carbon 到手几乎全新，跑分一切正常，比新机便宜了一半多，太值了！"</p>
+        <div style="font-size:12px;color:#bbb;margin-top:6px;">— 程序员小陈</div>
+      </div>
+      <div style="background:#fff;border-radius:12px;padding:18px;box-shadow:0 2px 8px rgba(0,0,0,.04);">
+        <div style="color:#E8952A;font-size:14px;margin-bottom:4px;">★★★★★</div>
+        <p style="font-size:14px;color:#555;">"给大学生妹妹买的 MacBook Air，颜值高、电池耐用，客服全程指导验机，很放心。"</p>
+        <div style="font-size:12px;color:#bbb;margin-top:6px;">— 大学生家属张姐</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div class="cta">
+    <h3>品质二手，就在这里</h3>
+    <p>打开微信，扫码或搜索「有闲甄选」</p>
+    <div class="qrcode">
+      [ 小程序码 ]
+    </div>
+    <div class="search-tip">微信搜索小程序：有闲甄选</div>
+  </div>
+
+  <div class="footer">
+    © 2026 有闲甄选 Selection in Idle · 品质好物 精心甄选
+  </div>
+
+</div>
+</body>
+</html>
