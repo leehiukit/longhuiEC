@@ -91,18 +91,22 @@ App({
 
   // 检查登录状态（含 Token 过期检测 + openid 恢复）
   checkLoginStatus() {
-    const tokenData = wx.getStorageSync('yxzx_token')
-    if (!tokenData || !tokenData.token) return
+    try {
+      const tokenData = wx.getStorageSync('yxzx_token')
+      if (!tokenData || !tokenData.token) return
 
-    // 检查是否过期
-    if (Date.now() > tokenData.expiresAt) {
-      wx.removeStorageSync('yxzx_token')
-      return
+      // 检查是否过期
+      if (Date.now() > tokenData.expiresAt) {
+        wx.removeStorageSync('yxzx_token')
+        return
+      }
+
+      this.globalData.isLoggedIn = true
+      this.globalData.userInfo = wx.getStorageSync('yxzx_user') || null
+      this.globalData.openid = tokenData.openid || (wx.getStorageSync('yxzx_user') || {}).openid || ''
+    } catch (_) {
+      // storage 读取异常（如存储空间满），跳过登录恢复
     }
-
-    this.globalData.isLoggedIn = true
-    this.globalData.userInfo = wx.getStorageSync('yxzx_user') || null
-    this.globalData.openid = tokenData.openid || wx.getStorageSync('yxzx_user')?.openid || ''
   },
 
   // 获取用户订单列表

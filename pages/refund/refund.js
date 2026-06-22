@@ -145,7 +145,7 @@ Page({
   },
 
   // 提交申请
-  submitRefund() {
+  async submitRefund() {
     const { reasonIndex, refundAmount } = this.data
 
     if (reasonIndex < 0) {
@@ -156,10 +156,7 @@ Page({
     }
 
     this.setData({ submitting: true })
-
     wx.showLoading({ title: '提交中...' })
-
-    wx.hideLoading()
 
     const refund = app.applyRefund({
         orderId: this.data.orderId,
@@ -175,23 +172,24 @@ Page({
       const orderNo = this.data.order.orderNo
       if (orderNo) {
         // ① 先通知 ERP 售后状态
-        API.ecommerceCallback(orderNo, 'RETURN_REQUESTED', {
-          returnReason: REFUND_REASONS[reasonIndex]
-        }).then(() => {
+        try {
+          await API.ecommerceCallback(orderNo, 'RETURN_REQUESTED', {
+            returnReason: REFUND_REASONS[reasonIndex]
+          })
           // ② 仅退款（未发货）→ 直接调用退款接口原路退钱
           if (this.data.refundType === 'refund') {
-            API.paymentRefund(orderNo, refundAmount, REFUND_REASONS[reasonIndex])
-              .then(refundRes => {
-                app.updateRefundStatus(refund.id, 'refunded', {
-                  refundAmount: refundRes.refundAmount || refundAmount,
-                  erpRefundId: refundRes.refundId
-                })
+            try {
+              const refundRes = await API.paymentRefund(orderNo, refundAmount, REFUND_REASONS[reasonIndex])
+              app.updateRefundStatus(refund.id, 'refunded', {
+                refundAmount: refundRes.refundAmount || refundAmount,
+                erpRefundId: refundRes.refundId
               })
-              .catch(() => {})
+            } catch (_) {}
           }
-        }).catch(() => {})
+        } catch (_) {}
       }
 
+    wx.hideLoading()
     this.setData({ submitting: false })
 
     wx.showToast({

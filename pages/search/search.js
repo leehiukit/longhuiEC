@@ -57,7 +57,7 @@ Page({
         list = allRes.data.filter(p => 
           p.title.toLowerCase().includes(keyword.toLowerCase()) ||
           (p.brand && p.brand.includes(keyword)) ||
-          (p.specs && p.specs.toLowerCase().includes(keyword.toLowerCase()))
+          (typeof p.specs === 'string' && p.specs.toLowerCase().includes(keyword.toLowerCase()))
         )
       }
 

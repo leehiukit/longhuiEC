@@ -122,6 +122,10 @@ Page({
           wx.hideLoading()
           updateManager.applyUpdate()
         })
+        updateManager.onUpdateFailed(() => {
+          wx.hideLoading()
+          wx.showToast({ title: '更新失败，请稍后重试', icon: 'none' })
+        })
       } else {
         wx.showToast({ title: '已是最新版本', icon: 'none' })
       }
