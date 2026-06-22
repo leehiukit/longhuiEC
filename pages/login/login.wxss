@@ -163,4 +163,25 @@
   flex-wrap: nowrap;
   max-width: 100%;
 }
+.agree-icon {
+  width: 32rpx;
+  height: 32rpx;
+  border: 2rpx solid #ccc;
+  border-radius: 6rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.2s;
+}
+.agree-icon.checked {
+  background: #E8952A;
+  border-color: #E8952A;
+}
+.agree-tick {
+  color: #fff;
+  font-size: 22rpx;
+  font-weight: bold;
+  line-height: 1;
+}
 .link { color: #E8952A; }

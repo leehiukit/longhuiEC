@@ -275,7 +275,11 @@ Page({
     wx.setStorageSync('yxzx_phone_users', records)
   },
 
-  onAgreeChange(e) { this.setData({ agreed: e.detail.value.length > 0 }) },
+  onAgreeChange(e) {
+    // 点击链接时不触发 toggle（catchtap 已阻止冒泡，此处双重保险）
+    if (e.target !== e.currentTarget) return
+    this.setData({ agreed: !this.data.agreed })
+  },
 
   viewAgreement() {
     wx.navigateTo({ url: '/pages/agreement/agreement?type=service' })

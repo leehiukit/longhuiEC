@@ -53,12 +53,14 @@
 
   <!-- 协议 -->
   <view class="agreement">
-    <label class="agree-check">
-      <checkbox checked="{{agreed}}" bindchange="onAgreeChange" color="#E8952A" />
+    <view class="agree-check" bindtap="onAgreeChange">
+      <view class="agree-icon {{agreed ? 'checked' : ''}}">
+        <text wx:if="{{agreed}}" class="agree-tick">✓</text>
+      </view>
       <text>登录即表示同意</text>
-      <text class="link" bindtap="viewAgreement">《有闲甄选服务协议》</text>
+      <text class="link" catchtap="viewAgreement">《有闲甄选服务协议》</text>
       <text>和</text>
-      <text class="link" bindtap="viewPrivacy">《隐私政策》</text>
-    </label>
+      <text class="link" catchtap="viewPrivacy">《隐私政策》</text>
+    </view>
   </view>
 </view>
