@@ -409,11 +409,13 @@ Page({
       this.setData({ paying: false })
 
       // 用户取消支付不算失败
-      if (err.errMsg && err.errMsg.includes('cancel')) {
+      const cancelMsg = err.errMsg || err.message || ''
+      if (cancelMsg.includes('cancel')) {
         wx.showToast({ title: '支付已取消', icon: 'none' })
         return
       }
-      const errMsg = err.message || '支付遇到问题'
+      // 提取可读错误（微信返回的 errMsg 或后端 message）
+      const errMsg = err.errMsg || err.message || '支付遇到问题'
       wx.showModal({
         title: '支付失败',
         content: `${errMsg}\n\n订单已保留，可在「我的订单」中继续支付`,

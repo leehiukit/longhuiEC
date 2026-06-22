@@ -50,7 +50,7 @@ function erpRequest(method, url, data, opts = {}) {
           reject(new Error(errMsg))
         }
       },
-      fail(err) { reject(err) }
+      fail(err) { reject(new Error(err.errMsg || '网络请求失败')) }
     })
   })
 }
@@ -254,19 +254,26 @@ function unifiedOrder(orderData) {
  */
 function requestPayment(payParams) {
   return new Promise((resolve, reject) => {
-    // ★ timeStamp 必须是 String 类型，后端可能返回 number
+    // ★ timeStamp 必须是 String 类型
     const timeStamp = String(payParams.timeStamp ?? '')
+    // ★ package 必须带 prepay_id= 前缀
+    const pkg = payParams.package || ''
+    const packageStr = pkg.startsWith('prepay_id=') ? pkg : ('prepay_id=' + pkg)
+    // ★ signType 必须与后端签名算法一致，如果不确定让后端传
+    const signType = payParams.signType || 'RSA'
     wx.requestPayment({
       timeStamp,
-      nonceStr: payParams.nonceStr || '',
-      package: payParams.package || '',
-      signType: payParams.signType || 'RSA',
-      paySign: payParams.paySign || '',
+      nonceStr: String(payParams.nonceStr || ''),
+      package: packageStr,
+      signType,
+      paySign: String(payParams.paySign || ''),
       success(res) {
         resolve(res)
       },
       fail(err) {
-        reject(err)
+        // ★ 微信 fail 回调的 err 没有 .message，只有 .errMsg
+        const reason = err?.errMsg || '支付调起失败'
+        reject(new Error(reason))
       }
     })
   })
