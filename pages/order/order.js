@@ -322,6 +322,19 @@ Page({
   // 第三步：确认支付（已对接微信支付）
   async confirmPayment() {
     if (this.data.paying) return
+
+    // ★ 支付前置校验：检查 token 和登录状态
+    const tokenData = wx.getStorageSync('yxzx_token')
+    if (!tokenData || !tokenData.token) {
+      return wx.showModal({
+        title: '未登录',
+        content: '登录状态已失效，请重新登录后再支付',
+        showCancel: false,
+        confirmText: '去登录',
+        success: () => wx.redirectTo({ url: '/pages/login/login' })
+      })
+    }
+
     this.setData({ paying: true })
 
     const order = app.getOrders().find(o => o.id === this.currentOrderId)
@@ -335,12 +348,12 @@ Page({
       const itemNames = (order.items || []).map(i => i.title).join('、').slice(0, 40)
       const totalFee = Math.round(parseFloat(this.data.finalPrice) * 100)
       const orderNo = this.currentOrderNo || order.id
-      const openid = app.globalData.openid || ''
-      // openid 现为可选，后端自动从数据库查询已绑定用户的 openid
+      // ★ openid 优先 globalData，其次从 storage token/user 恢复
+      const openid = app.globalData.openid
+        || tokenData.openid
+        || (wx.getStorageSync('yxzx_user') || {}).openid
+        || ''
 
-      if (!this.currentOrderNo) {
-        // 未检测到 ERP 订单号，将使用本地 ID 支付
-      }
       if (totalFee <= 0) {
         this.setData({ paying: false })
         return wx.showToast({ title: '支付金额无效', icon: 'none' })
@@ -356,6 +369,11 @@ Page({
         attach: order.id
       })
       wx.hideLoading()
+
+      // ★ 后端返回的支付参数校验
+      if (!payParams || !payParams.package) {
+        throw new Error('服务端返回的支付参数无效')
+      }
 
       // ③ 调起微信支付
       await API.requestPayment(payParams)

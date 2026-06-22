@@ -254,8 +254,10 @@ function unifiedOrder(orderData) {
  */
 function requestPayment(payParams) {
   return new Promise((resolve, reject) => {
+    // ★ timeStamp 必须是 String 类型，后端可能返回 number
+    const timeStamp = String(payParams.timeStamp ?? '')
     wx.requestPayment({
-      timeStamp: payParams.timeStamp || '',
+      timeStamp,
       nonceStr: payParams.nonceStr || '',
       package: payParams.package || '',
       signType: payParams.signType || 'RSA',
