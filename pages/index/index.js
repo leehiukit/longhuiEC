@@ -16,6 +16,21 @@ Page({
     this.loadData()
   },
 
+  onShareAppMessage() {
+    return {
+      title: '有闲甄选 — 品质二手笔记本，企享收直供',
+      path: '/pages/index/index',
+      imageUrl: ''
+    }
+  },
+
+  onShareTimeline() {
+    return {
+      title: '那些被大公司退下来的笔记本，都去哪了？',
+      query: ''
+    }
+  },
+
   onPullDownRefresh() {
     this.loadData().then(() => wx.stopPullDownRefresh())
   },

@@ -113,4 +113,13 @@ Page({
   goCart() {
     wx.switchTab({ url: '/pages/cart/cart' })
   },
+
+  onShareAppMessage() {
+    const product = this.data.product
+    return {
+      title: product ? `${product.title || product.name} — 有闲甄选` : '有闲甄选 — 品质二手笔记本',
+      path: `/pages/detail/detail?id=${this.data.productId}`,
+      imageUrl: ''
+    }
+  },
 })

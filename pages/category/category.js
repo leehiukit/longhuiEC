@@ -20,6 +20,14 @@ Page({
     this.loadCategories()
   },
 
+  onShareAppMessage() {
+    return {
+      title: '有闲甄选 — 严选品牌二手笔记本，企享收直供',
+      path: '/pages/category/category',
+      imageUrl: ''
+    }
+  },
+
   onShow() {
     // 从首页点击分类入口时，同步选中分类
     const selectedId = app.globalData.selectedCategoryId
