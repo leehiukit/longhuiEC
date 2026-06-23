@@ -4,12 +4,36 @@
   "packOptions": {
     "ignore": [
       {
-        "type": "file",
+        "type": "glob",
         "value": "*.md"
       },
       {
-        "type": "file",
+        "type": "glob",
         "value": "README.md"
+      },
+      {
+        "type": "glob",
+        "value": "generated-images/**"
+      },
+      {
+        "type": "glob",
+        "value": "公众号推文.*"
+      },
+      {
+        "type": "glob",
+        "value": "小程序码.*"
+      },
+      {
+        "type": "glob",
+        "value": ".git/**"
+      },
+      {
+        "type": "glob",
+        "value": ".gitignore"
+      },
+      {
+        "type": "glob",
+        "value": "*.html"
       }
     ],
     "include": []
